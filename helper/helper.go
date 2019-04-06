@@ -81,3 +81,13 @@ func GetList(str, seperator string) ([]int, bool) {
 	}
 	return ii, false
 }
+
+// IsDigit determines whether the given string is a digit or not
+func IsDigit(s string) bool {
+	_, err := strconv.Atoi(s)
+	if err == nil {
+		return true
+	}
+
+	return false
+}

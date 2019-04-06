@@ -23,9 +23,9 @@ func init() {
 
 func translate(cmd *cobra.Command, args []string) {
 
-	if vErr := translator.Validate(); vErr != nil {
+	if vErr := translator.Validate(); len(vErr) != 0 {
 		for k, v := range vErr {
-			fmt.Printf("%v: %v", k, v)
+			fmt.Printf("%v: %v\n", k, v)
 		}
 		return
 	}
