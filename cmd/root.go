@@ -17,7 +17,7 @@ CronTalk: Talk to the cron expressions!!
 ------------------------------------------
 
 Translate your cron expressions into very understandable english words.
-Scan the expression for previous/future occurences.
+Scan the expression for future occurences.
 
 Valid Cron Expressions:
 -----------------------
@@ -31,6 +31,7 @@ Valid Cron Expressions:
 
 func init() {
 	RootCmd.AddCommand(translateCmd)
+	RootCmd.AddCommand(nextCmd)
 }
 
 // Execute the root command

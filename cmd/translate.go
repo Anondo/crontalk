@@ -11,13 +11,13 @@ import (
 var (
 	translateCmd = &cobra.Command{
 		Use:   "translate",
-		Short: "translates the given cron expression to english words",
+		Short: "Translates the given cron expression to english words",
 		Run:   translate,
 	}
 )
 
 func init() {
-	translateCmd.Flags().StringVarP(&translator.CronExprsn, "cron", "c", "", "the cron expression to translate to english words")
+	translateCmd.Flags().StringVarP(&translator.CronExprsn, "cron", "c", "", "The cron expression to translate to english words")
 
 }
 
