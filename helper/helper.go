@@ -65,21 +65,13 @@ func PrettyTime(h string, m string) (string, error) {
 
 }
 
-// GetList takes a string & returns a slice separated by the separator provided & also
-//converts the string to int
-func GetList(str, seperator string) ([]int, bool) {
+// GetList takes a string & returns a slice separated by the separator provided & true/false based on the length of the slice
+func GetList(str, seperator string) ([]string, bool) {
 	ss := strings.Split(str, seperator)
-	ii := []int{}
-	for _, s := range ss {
-		i, _ := strconv.Atoi(s)
-		if s != "*" {
-			ii = append(ii, i)
-		}
+	if len(ss) > 1 {
+		return ss, true
 	}
-	if len(ii) > 1 {
-		return ii, true
-	}
-	return ii, false
+	return ss, false
 }
 
 // IsDigit determines whether the given string is a digit or not
@@ -90,4 +82,12 @@ func IsDigit(s string) bool {
 	}
 
 	return false
+}
+
+//GetStrIfTrue returns the given string if the provided bool is true
+func GetStrIfTrue(s string, l bool) string {
+	if l {
+		return s
+	}
+	return ""
 }
