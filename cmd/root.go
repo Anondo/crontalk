@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crontalk/config"
 	"crontalk/helper"
 	"log"
 
@@ -30,6 +31,7 @@ Valid Cron Expressions:
 )
 
 func init() {
+	config.LoadConfig()
 	RootCmd.AddCommand(translateCmd)
 	RootCmd.AddCommand(nextCmd)
 }
