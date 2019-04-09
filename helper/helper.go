@@ -98,6 +98,12 @@ func Get12Hour(h string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	hs := strconv.Itoa(hi - 12)
+	var hs string
+	if hi < 12 {
+		hs = strconv.Itoa(hi)
+	} else {
+		hs = strconv.Itoa(hi - 12)
+	}
+
 	return hs, nil
 }
