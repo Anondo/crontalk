@@ -91,3 +91,13 @@ func GetStrIfTrue(s string, l bool) string {
 	}
 	return ""
 }
+
+// Get12Hour takes a 24hr format string & returns its 12hr format
+func Get12Hour(h string) (string, error) {
+	hi, err := strconv.Atoi(h)
+	if err != nil {
+		return "", err
+	}
+	hs := strconv.Itoa(hi - 12)
+	return hs, nil
+}

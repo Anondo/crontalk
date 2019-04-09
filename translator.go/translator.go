@@ -56,40 +56,97 @@ func Init() {
 
 func translateBaseOccurence() error {
 	var i int
-	for i = weekIndex; i > hourIndex; i-- { //start iterating from the last sub-expressions to determine the starting string
+	//---------------------start iterating from the last sub-expressions to determine the starting string ------------------
+	for i = weekIndex; i > hourIndex; i-- {
 		if cronSlice[i] != anyValue {
 			cc, listed := helper.GetList(cronSlice[i], ",")
-			for j, c := range cc { //iterating because values can be listed
-				if moments[i] == week { // checking for weekly
-					wi, err := strconv.Atoi(c)
-					if err != nil {
-						return err
-					}
-					//the following is for proper & meaningful sentence
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+weeks[wi], j == 0)      //if this is the first check
-					translatedString += helper.GetStrIfTrue(weeks[wi], j > 0)                                          //just keep adding the value & not the full sentence
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1) //print "and" for listed
-					continue
-				}
-				if moments[i] == month { // checking for monthly, in seperate if blocks because , slight change of translated string
-					mi, err := strconv.Atoi(c)
-					if err != nil {
-						return err
+			//-----------------------------iterating because values can be listed------------------------
+			for j, c := range cc {
+				rr, ranged := helper.GetList(c, "-")
+				//------------------------------- checking for weekly----------------------------------------
+				if moments[i] == week {
+					var wi, wi1, wi2 int
+					if ranged {
+						var err1, err2 error
+						wi1, err1 = strconv.Atoi(rr[0])
+						wi2, err2 = strconv.Atoi(rr[1])
+						if err1 != nil || err2 != nil {
+							return err1 //any one will do
+						}
+					} else {
+						var err error
+						wi, err = strconv.Atoi(c)
+						if err != nil {
+							return err
+						}
 					}
 
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+months[mi], j == 0)
-					translatedString += helper.GetStrIfTrue(months[mi], j > 0)
+					//the following is for proper & meaningful sentence
+					if ranged {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+weeks[wi1]+
+							viper.GetString(configStr+"to")+weeks[wi2], j == 0) //if this is the first check
+						translatedString += helper.GetStrIfTrue(weeks[wi1]+viper.GetString(configStr+"to")+weeks[wi2],
+							j > 0) //just keep adding the value & not the full sentence
+
+					} else {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+weeks[wi], j == 0) //if this is the first check
+						translatedString += helper.GetStrIfTrue(weeks[wi], j > 0)                                     //just keep adding the value & not the full sentence
+					}
+					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1) //print "and" for listed
+					continue
+
+				}
+				//----------------------------------------------------------------------------------------
+				//------------- checking for monthly, in seperate if blocks because , slight change of translated string-------------
+				if moments[i] == month {
+					var mi, mi1, mi2 int
+					if ranged {
+						var err1, err2 error
+						mi1, err1 = strconv.Atoi(rr[0])
+						mi2, err2 = strconv.Atoi(rr[1])
+						if err1 != nil || err2 != nil {
+							return err1 //again, any one will do
+						}
+					} else {
+						var err error
+						mi, err = strconv.Atoi(c)
+						if err != nil {
+							return err
+						}
+					}
+
+					if ranged {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+months[mi1]+
+							viper.GetString(configStr+"to")+months[mi2], j == 0)
+						translatedString += helper.GetStrIfTrue(months[mi1]+viper.GetString(configStr+"to")+
+							months[mi2], j > 0)
+					} else {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+months[mi], j == 0)
+						translatedString += helper.GetStrIfTrue(months[mi], j > 0)
+					}
 					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
 					continue
 				}
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moments[i]+" "+c, j == 0) //checking for the day
-				translatedString += helper.GetStrIfTrue(c, j > 0)
+				//---------------------------------------------------------------------------------------
+				////--------------------------------checking for the day--------------------------------------
+				if ranged {
+					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moments[i]+" "+
+						rr[0]+viper.GetString(configStr+"to")+rr[1], j == 0)
+					translatedString += helper.GetStrIfTrue(rr[0]+viper.GetString(configStr+"to")+rr[1],
+						j > 0)
+				} else {
+					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moments[i]+" "+c, j == 0)
+					translatedString += helper.GetStrIfTrue(c, j > 0)
+				}
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
 				continue
+				//---------------------------------------------------------------------------------------------
 			}
+			//---------------------------------------------------------------------------------------------
 			break
 		}
 	}
+	//---------------------------------------------------------------------------------------
 	if i == hourIndex { // checking if every sub-expression contains asteriks apart from the time part
 		translatedString += viper.GetString(configStr + "every_day")
 	}
@@ -101,37 +158,87 @@ func translateBaseOccurence() error {
 }
 
 func translateAllButBaseTimeOccurence() error {
-	for i := dayIndex; i <= weekIndex; i++ { // checking every other sub-expressions apart from the base and time, no need for reverse travel
-		if cronSlice[i] != anyValue && i != baseIndex { // no gonna check the base
+	//------- checking every other sub-expressions apart from the base and time, no need for reverse travel---------
+	for i := dayIndex; i <= weekIndex; i++ {
+		// ----------------not gonna check the base ---------------------------
+		if cronSlice[i] != anyValue && i != baseIndex {
 			cc, listed := helper.GetList(cronSlice[i], ",")
+			//-------------------------iterating the single sub-expressions-------------------------
 			for j, c := range cc {
+				rr, ranged := helper.GetList(c, "-")
 				if moments[i] == week {
-					wi, err := strconv.Atoi(c)
-					if err != nil {
-						return err
+					var wi, wi1, wi2 int
+					if ranged {
+						var err1, err2 error
+						wi1, err1 = strconv.Atoi(rr[0])
+						wi2, err2 = strconv.Atoi(rr[1])
+						if err1 != nil || err2 != nil {
+							return err1
+						}
+					} else {
+						var err error
+						wi, err = strconv.Atoi(c)
+						if err != nil {
+							return err
+						}
 					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on")+weeks[wi], j == 0)
-					translatedString += helper.GetStrIfTrue(weeks[wi], j > 0)
+					if ranged {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on")+weeks[wi1]+
+							viper.GetString(configStr+"to")+weeks[wi2], j == 0)
+						translatedString += helper.GetStrIfTrue(weeks[wi1]+viper.GetString(configStr+"to")+
+							weeks[wi2], j > 0)
+					} else {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on")+weeks[wi], j == 0)
+						translatedString += helper.GetStrIfTrue(weeks[wi], j > 0)
+					}
 					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
 				} else if moments[i] == month {
-					mi, err := strconv.Atoi(c)
-					if err != nil {
-						return err
+					var mi, mi1, mi2 int
+					if ranged {
+						var err1, err2 error
+						mi1, err1 = strconv.Atoi(rr[0])
+						mi2, err2 = strconv.Atoi(rr[1])
+						if err1 != nil || err2 != nil {
+							return err1
+						}
+					} else {
+						var err error
+						mi, err = strconv.Atoi(c)
+						if err != nil {
+							return err
+						}
 					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on_month_of")+months[mi], j == 0)
-					translatedString += helper.GetStrIfTrue(months[mi], j > 0)
+					if ranged {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on_month_of")+months[mi1]+
+							viper.GetString(configStr+"to")+months[mi2], j == 0)
+						translatedString += helper.GetStrIfTrue(months[mi1]+viper.GetString(configStr+"to")+
+							months[mi2], j > 0)
+					} else {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on_month_of")+months[mi], j == 0)
+						translatedString += helper.GetStrIfTrue(months[mi], j > 0)
+					}
 					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
 
 				} else {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"onn")+moments[i]+" "+c, j == 0) //no breaks like base and a bit different string
-					translatedString += helper.GetStrIfTrue(c, j > 0)
+					if ranged {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"onn")+moments[i]+" "+
+							rr[0]+viper.GetString(configStr+"to")+rr[1], j == 0)
+						translatedString += helper.GetStrIfTrue(rr[0]+viper.GetString(configStr+"to")+rr[1],
+							j > 0)
+					} else {
+						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"onn")+moments[i]+" "+c, j == 0) //no breaks like base and a bit different string
+						translatedString += helper.GetStrIfTrue(c, j > 0)
+					}
 					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
 
 				}
 			}
+			//------------------------------------------------------------------------------
 
 		}
+		//-----------------------------------------------------------------------------
 	}
+	//----------------------------------------------------------------------------------------
 	return nil
 }
 
@@ -145,6 +252,18 @@ func translateTimeOccurence() error {
 		hh, listedH := helper.GetList(h, ",")
 		for i, min := range mm {
 			for j, hr := range hh {
+				// mrr, rangedM := helper.GetList(min, "-")
+				// hrr, rangedH := helper.GetList(hr, "-")
+				// if rangedH {
+				// 	var err1, err2 error
+				// 	var hr1, hr2 string
+				// 	hr1, err1 = helper.Get12Hour(hrr[0])
+				// 	hr2, err2 = helper.Get12Hour(hrr[1])
+				// 	if err1 != nil || err2 != nil {
+				// 		return err1
+				// 	}
+				//
+				// }  TODO: complete this
 				pt, err := helper.PrettyTime(hr, min)
 				if err != nil {
 					return err
