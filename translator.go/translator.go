@@ -7,10 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: Fix normal hour ranged minute bug
-// TODO: fix single 24hour hour only bug
-// TODO: convert hour in bangla
-
 const (
 	english = "english"
 	bangla  = "bangla"
@@ -30,6 +26,7 @@ func Init() {
 		language = bangla
 		moments[dayIndex] = "দিন:" //not taking from config for the sake of simplicity
 		moments[minuteIndex] = "মিনিট:"
+		moments[hourIndex] = "ঘন্টা:"
 	}
 	configStr = "language." + language + "." //the config index to parse the config yaml file from viper
 
@@ -265,15 +262,10 @@ func translateTimeOccurence() error {
 						mrr[1], i > 0 || j > 0)
 				}
 				if rangedH {
-					hr1, err1 := helper.Get12Hour(hrr[0])
-					hr2, err2 := helper.Get12Hour(hrr[1])
-					if err1 != nil || err2 != nil {
-						return err1
-					}
-					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hr1+viper.GetString(configStr+"to")+
-						hr2, i == 0 && j == 0)
-					translatedString += helper.GetStrIfTrue(hr1+viper.GetString(configStr+"to")+
-						hr2, i > 0 || j > 0)
+					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
+						hrr[1], i == 0 && j == 0)
+					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
+						hrr[1], i > 0 || j > 0)
 				}
 				if !rangedM && !rangedH {
 					pt, err := helper.PrettyTime(hr, min)
@@ -282,6 +274,12 @@ func translateTimeOccurence() error {
 					}
 					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+pt, i == 0 && j == 0)
 					translatedString += helper.GetStrIfTrue(pt, i > 0 || j > 0)
+				} else if !rangedH && rangedM {
+					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+
+						" "+hr, true)
+				} else if rangedH && !rangedM {
+					translatedString += helper.GetStrIfTrue(" "+moments[minuteIndex]+
+						" "+min, true)
 				}
 
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), (listedM || listedH) &&
