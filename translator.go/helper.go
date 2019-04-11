@@ -7,56 +7,81 @@ import (
 	"github.com/spf13/viper"
 )
 
-func translateBaseWeekMonth(c string, ranged, listed bool, rr, cc []string, j int, m string) (bool, error) {
+type translator struct {
+	cron          string   //the cron sub-expression
+	moment        string   // the moment of the sub-expression
+	cronRange     []string //then the two ranged values in string
+	ranged        bool     //if the sub-expression is ranged
+	listed        bool     //if the sub-expression is listed
+	base          bool     // if the occurence is base
+	cronListedLen int      //the len of the listed sub-expression
+	index         int      // the current index of the listed sub-expression
+}
+
+func (t *translator) translateWeekMonth() (bool, error) {
 	var v, v1, v2 int
-	if ranged {
+	var mtext string
+
+	if t.ranged {
 		var err1, err2 error
-		v1, err1 = strconv.Atoi(rr[0])
-		v2, err2 = strconv.Atoi(rr[1])
+		v1, err1 = strconv.Atoi(t.cronRange[0])
+		v2, err2 = strconv.Atoi(t.cronRange[1])
 		if err1 != nil || err2 != nil {
 			return false, err1 //any one will do
 		}
 	} else {
 		var err error
-		v, err = strconv.Atoi(c)
+		v, err = strconv.Atoi(t.cron)
 		if err != nil {
 			return false, err
 		}
 	}
 
-	if m != week && m != month {
+	if t.moment != week && t.moment != month {
 		return false, nil
 	}
-	moment := weeks
-	if m == month {
-		moment = months
+	if t.base {
+		mtext = "every"
+	}
+	mm := weeks
+	if !t.base {
+		mtext = "on"
+	}
+	if t.moment == month {
+		mm = months
+		if !t.base {
+			mtext = "on_month_of"
+		}
 	}
 
 	//the following is for proper & meaningful sentence
-	if ranged {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moment[v1]+
-			viper.GetString(configStr+"to")+moment[v2], j == 0) //if this is the first check
-		translatedString += helper.GetStrIfTrue(moment[v1]+viper.GetString(configStr+"to")+moment[v2],
-			j > 0) //just keep adding the value & not the full sentence
+	if t.ranged {
+		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+mm[v1]+
+			viper.GetString(configStr+"to")+mm[v2], t.index == 0) //if this is the first check
+		translatedString += helper.GetStrIfTrue(mm[v1]+viper.GetString(configStr+"to")+mm[v2],
+			t.index > 0) //just keep adding the value & not the full sentence
 
 	} else {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moment[v], j == 0) //if this is the first check
-		translatedString += helper.GetStrIfTrue(moment[v], j > 0)                                     //just keep adding the value & not the full sentence
+		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+mm[v], t.index == 0) //if this is the first check
+		translatedString += helper.GetStrIfTrue(mm[v], t.index > 0)                                   //just keep adding the value & not the full sentence
 	}
-	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1) //print "and" for listed
+	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1) //print "and" for listed
 	return true, nil
 }
 
-func translateBaseDay(ranged, listed bool, rr, cc []string, j int, c string, moment string) error {
-	if ranged {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moment+" "+
-			rr[0]+viper.GetString(configStr+"to")+rr[1], j == 0)
-		translatedString += helper.GetStrIfTrue(rr[0]+viper.GetString(configStr+"to")+rr[1],
-			j > 0)
-	} else {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moment+" "+c, j == 0)
-		translatedString += helper.GetStrIfTrue(c, j > 0)
+func (t *translator) translateDay() {
+	mtext := "every"
+	if !t.base {
+		mtext = "onn"
 	}
-	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
-	return nil
+	if t.ranged {
+		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+t.moment+" "+
+			t.cronRange[0]+viper.GetString(configStr+"to")+t.cronRange[1], t.index == 0)
+		translatedString += helper.GetStrIfTrue(t.cronRange[0]+viper.GetString(configStr+"to")+t.cronRange[1],
+			t.index > 0)
+	} else {
+		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+t.moment+" "+t.cron, t.index == 0)
+		translatedString += helper.GetStrIfTrue(t.cron, t.index > 0)
+	}
+	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1)
 }

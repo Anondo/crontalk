@@ -2,13 +2,11 @@ package translator
 
 import (
 	"crontalk/helper"
-	"strconv"
 
 	"github.com/spf13/viper"
 )
 
-// TODO: add helper function of allbutbasetime occurence
-// TODO: if possible, try to combine allbutbasetime and base helper function
+// TODO: refactor timeoccurence
 // TODO: reduce complexity
 // TODO: add step values
 
@@ -67,14 +65,22 @@ func translateBaseOccurence() error {
 			cc, listed := helper.GetList(cronSlice[i], ",")
 			for j, c := range cc { //iterating because values can be listed
 				rr, ranged := helper.GetList(c, "-")
-				if found, err := translateBaseWeekMonth(c, ranged, listed, rr, cc, j, moments[i]); err != nil {
+				t := translator{
+					cron:          c,
+					moment:        moments[i],
+					cronRange:     rr,
+					ranged:        ranged,
+					listed:        listed,
+					base:          true,
+					cronListedLen: len(cc),
+					index:         j,
+				}
+				if found, err := t.translateWeekMonth(); err != nil {
 					return err
 				} else if found {
 					continue
 				}
-				if err := translateBaseDay(ranged, listed, rr, cc, j, c, moments[i]); err != nil {
-					return err
-				}
+				t.translateDay()
 			}
 			break //once the base value is found no need for further iterations
 		}
@@ -89,87 +95,30 @@ func translateBaseOccurence() error {
 }
 
 func translateAllButBaseTimeOccurence() error {
-	//------- checking every other sub-expressions apart from the base and time, no need for reverse travel---------
-	for i := dayIndex; i <= weekIndex; i++ {
-		// ----------------not gonna check the base ---------------------------
-		if cronSlice[i] != anyValue && i != baseIndex {
+
+	for i := dayIndex; i <= weekIndex; i++ { //checking every other sub-expressions apart from the base and time, no need for reverse travel
+		if cronSlice[i] != anyValue && i != baseIndex { //not gonna check the base
 			cc, listed := helper.GetList(cronSlice[i], ",")
-			//-------------------------iterating the single sub-expressions-------------------------
-			for j, c := range cc {
+			for j, c := range cc { //iterating the single sub-expressions
 				rr, ranged := helper.GetList(c, "-")
-				if moments[i] == week {
-					var wi, wi1, wi2 int
-					if ranged {
-						var err1, err2 error
-						wi1, err1 = strconv.Atoi(rr[0])
-						wi2, err2 = strconv.Atoi(rr[1])
-						if err1 != nil || err2 != nil {
-							return err1
-						}
-					} else {
-						var err error
-						wi, err = strconv.Atoi(c)
-						if err != nil {
-							return err
-						}
-					}
-					if ranged {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on")+weeks[wi1]+
-							viper.GetString(configStr+"to")+weeks[wi2], j == 0)
-						translatedString += helper.GetStrIfTrue(weeks[wi1]+viper.GetString(configStr+"to")+
-							weeks[wi2], j > 0)
-					} else {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on")+weeks[wi], j == 0)
-						translatedString += helper.GetStrIfTrue(weeks[wi], j > 0)
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
-				} else if moments[i] == month {
-					var mi, mi1, mi2 int
-					if ranged {
-						var err1, err2 error
-						mi1, err1 = strconv.Atoi(rr[0])
-						mi2, err2 = strconv.Atoi(rr[1])
-						if err1 != nil || err2 != nil {
-							return err1
-						}
-					} else {
-						var err error
-						mi, err = strconv.Atoi(c)
-						if err != nil {
-							return err
-						}
-					}
-					if ranged {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on_month_of")+months[mi1]+
-							viper.GetString(configStr+"to")+months[mi2], j == 0)
-						translatedString += helper.GetStrIfTrue(months[mi1]+viper.GetString(configStr+"to")+
-							months[mi2], j > 0)
-					} else {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"on_month_of")+months[mi], j == 0)
-						translatedString += helper.GetStrIfTrue(months[mi], j > 0)
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
-
-				} else {
-					if ranged {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"onn")+moments[i]+" "+
-							rr[0]+viper.GetString(configStr+"to")+rr[1], j == 0)
-						translatedString += helper.GetStrIfTrue(rr[0]+viper.GetString(configStr+"to")+rr[1],
-							j > 0)
-					} else {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"onn")+moments[i]+" "+c, j == 0) //no breaks like base and a bit different string
-						translatedString += helper.GetStrIfTrue(c, j > 0)
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
-
+				t := translator{
+					cron:          c,
+					moment:        moments[i],
+					cronRange:     rr,
+					ranged:        ranged,
+					listed:        listed,
+					base:          false,
+					cronListedLen: len(cc),
+					index:         j,
+				}
+				if found, err := t.translateWeekMonth(); err != nil {
+					return err
+				} else if !found {
+					t.translateDay()
 				}
 			}
-			//------------------------------------------------------------------------------
-
 		}
-		//-----------------------------------------------------------------------------
 	}
-	//----------------------------------------------------------------------------------------
 	return nil
 }
 
