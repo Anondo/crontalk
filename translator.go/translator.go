@@ -7,6 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+// TODO: add helper function of allbutbasetime occurence
+// TODO: if possible, try to combine allbutbasetime and base helper function
+// TODO: reduce complexity
+// TODO: add step values
+
 const (
 	english = "english"
 	bangla  = "bangla"
@@ -57,103 +62,28 @@ func Init() {
 
 func translateBaseOccurence() error {
 	var i int
-	//---------------------start iterating from the last sub-expressions to determine the starting string ------------------
-	for i = weekIndex; i > hourIndex; i-- {
+	for i = weekIndex; i > hourIndex; i-- { //start iterating from the last sub-expressions to determine the starting string
 		if cronSlice[i] != anyValue {
 			cc, listed := helper.GetList(cronSlice[i], ",")
-			//-----------------------------iterating because values can be listed------------------------
-			for j, c := range cc {
+			for j, c := range cc { //iterating because values can be listed
 				rr, ranged := helper.GetList(c, "-")
-				//------------------------------- checking for weekly----------------------------------------
-				if moments[i] == week {
-					var wi, wi1, wi2 int
-					if ranged {
-						var err1, err2 error
-						wi1, err1 = strconv.Atoi(rr[0])
-						wi2, err2 = strconv.Atoi(rr[1])
-						if err1 != nil || err2 != nil {
-							return err1 //any one will do
-						}
-					} else {
-						var err error
-						wi, err = strconv.Atoi(c)
-						if err != nil {
-							return err
-						}
-					}
-
-					//the following is for proper & meaningful sentence
-					if ranged {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+weeks[wi1]+
-							viper.GetString(configStr+"to")+weeks[wi2], j == 0) //if this is the first check
-						translatedString += helper.GetStrIfTrue(weeks[wi1]+viper.GetString(configStr+"to")+weeks[wi2],
-							j > 0) //just keep adding the value & not the full sentence
-
-					} else {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+weeks[wi], j == 0) //if this is the first check
-						translatedString += helper.GetStrIfTrue(weeks[wi], j > 0)                                     //just keep adding the value & not the full sentence
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1) //print "and" for listed
-					continue
-
-				}
-				//----------------------------------------------------------------------------------------
-				//------------- checking for monthly, in seperate if blocks because , slight change of translated string-------------
-				if moments[i] == month {
-					var mi, mi1, mi2 int
-					if ranged {
-						var err1, err2 error
-						mi1, err1 = strconv.Atoi(rr[0])
-						mi2, err2 = strconv.Atoi(rr[1])
-						if err1 != nil || err2 != nil {
-							return err1 //again, any one will do
-						}
-					} else {
-						var err error
-						mi, err = strconv.Atoi(c)
-						if err != nil {
-							return err
-						}
-					}
-
-					if ranged {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+months[mi1]+
-							viper.GetString(configStr+"to")+months[mi2], j == 0)
-						translatedString += helper.GetStrIfTrue(months[mi1]+viper.GetString(configStr+"to")+
-							months[mi2], j > 0)
-					} else {
-						translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+months[mi], j == 0)
-						translatedString += helper.GetStrIfTrue(months[mi], j > 0)
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
+				if found, err := translateBaseWeekMonth(c, ranged, listed, rr, cc, j, moments[i]); err != nil {
+					return err
+				} else if found {
 					continue
 				}
-				//---------------------------------------------------------------------------------------
-				////--------------------------------checking for the day--------------------------------------
-				if ranged {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moments[i]+" "+
-						rr[0]+viper.GetString(configStr+"to")+rr[1], j == 0)
-					translatedString += helper.GetStrIfTrue(rr[0]+viper.GetString(configStr+"to")+rr[1],
-						j > 0)
-				} else {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"every")+moments[i]+" "+c, j == 0)
-					translatedString += helper.GetStrIfTrue(c, j > 0)
+				if err := translateBaseDay(ranged, listed, rr, cc, j, c, moments[i]); err != nil {
+					return err
 				}
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && j < len(cc)-1)
-				continue
-				//---------------------------------------------------------------------------------------------
 			}
-			//---------------------------------------------------------------------------------------------
-			break
+			break //once the base value is found no need for further iterations
 		}
 	}
-	//---------------------------------------------------------------------------------------
 	if i == hourIndex { // checking if every sub-expression contains asteriks apart from the time part
 		translatedString += viper.GetString(configStr + "every_day")
 	}
 	baseIndex = i //storing the base index so that when checking every other than time , the base is also omitted because its
 	//already checked
-
 	return nil
 
 }
