@@ -85,3 +85,85 @@ func (t *translator) translateDay() {
 	}
 	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1)
 }
+
+func translateMinuteAndHour() error {
+	m := cronSlice[minuteIndex]
+	h := cronSlice[hourIndex]
+	mm, listedM := helper.GetList(m, ",")
+	hh, listedH := helper.GetList(h, ",")
+	for i, min := range mm { // nested loops are required as, if both the minute & hour values are listed ,the
+		for j, hr := range hh { //time is be shown as, for each minute the listed hours
+			mrr, rangedM := helper.GetList(min, "-")
+			hrr, rangedH := helper.GetList(hr, "-")
+			if rangedM { //if the minute is ranged
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+
+					moments[minuteIndex]+" "+mrr[0]+viper.GetString(configStr+"to")+mrr[1], i == 0 && j == 0)
+				translatedString += helper.GetStrIfTrue(mrr[0]+viper.GetString(configStr+"to")+
+					mrr[1], i > 0 || j > 0)
+			}
+			if rangedH { // if the hour is ranged
+				translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
+					hrr[1], i == 0 && j == 0)
+				translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
+					hrr[1], i > 0 || j > 0)
+			}
+			if !rangedM && !rangedH { // if none of them are ranged
+				pt, err := helper.PrettyTime(hr, min)
+				if err != nil {
+					return err
+				}
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+pt, i == 0 && j == 0)
+				translatedString += helper.GetStrIfTrue(pt, i > 0 || j > 0)
+			} else if !rangedH && rangedM { //or if only the minute is ranged
+				translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+
+					" "+hr, true)
+			} else if rangedH && !rangedM { //if only the hour is ranged
+				translatedString += helper.GetStrIfTrue(" "+moments[minuteIndex]+
+					" "+min, true)
+			}
+
+			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), (listedM || listedH) &&
+				(i < len(mm)-1) || (j < len(hh)-1))
+		}
+	}
+	return nil
+}
+
+func translateMinuteOrHour() {
+	mStr := moments[minuteIndex] // assuming minute is not default
+	mVal := cronSlice[minuteIndex]
+	if mVal == anyValue { //if so
+		hVal := cronSlice[hourIndex] // working with the hour only
+		hh, listed := helper.GetList(hVal, ",")
+		for i, hr := range hh { // iterating because could be a list
+			hrr, ranged := helper.GetList(hr, "-")
+			if ranged { // checking if the value is ranged , different output if so
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hrr[0]+
+					viper.GetString(configStr+"to")+hrr[1], i == 0)
+				translatedString += helper.GetStrIfTrue(hrr[0]+viper.GetString(configStr+"to")+hrr[1], i > 0)
+
+			} else {
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hr, i == 0)
+				translatedString += helper.GetStrIfTrue(hr, i > 0)
+			}
+
+			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(hh)-1)
+		}
+	} else {
+		mm, listed := helper.GetList(mVal, ",") // working with minute only
+		for i, min := range mm {                //iterating because could be a list
+			mr, ranged := helper.GetList(min, "-")
+			if ranged { //checking if the value is ranged
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+mStr+" "+mr[0]+
+					viper.GetString(configStr+"to")+mr[1], i == 0)
+				translatedString += helper.GetStrIfTrue(mr[0]+viper.GetString(configStr+"to")+mr[1], i > 0)
+			} else {
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+mStr+" "+mVal, i == 0)
+				translatedString += helper.GetStrIfTrue(min, i > 0)
+			}
+
+			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(mm)-1)
+		}
+	}
+
+}

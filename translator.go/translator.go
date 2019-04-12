@@ -6,7 +6,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: refactor timeoccurence
+// TODO: Add validation for ranged values like the from range cannot be greater than the to range
+// TODO: refacrot the huge validation code
+// TODO: refactor timeoccurence more if possible
 // TODO: reduce complexity
 // TODO: add step values
 
@@ -126,87 +128,11 @@ func translateTimeOccurence() error {
 	if cronSlice[minuteIndex] == anyValue && cronSlice[hourIndex] == anyValue { // checking if both hour and minute are defaults
 		translatedString += viper.GetString(configStr + "at_every_minute")
 	} else if cronSlice[minuteIndex] != anyValue && cronSlice[hourIndex] != anyValue { //checking if non of them are
-		m := cronSlice[minuteIndex]
-		h := cronSlice[hourIndex]
-		mm, listedM := helper.GetList(m, ",")
-		hh, listedH := helper.GetList(h, ",")
-		for i, min := range mm {
-			for j, hr := range hh {
-				mrr, rangedM := helper.GetList(min, "-")
-				hrr, rangedH := helper.GetList(hr, "-")
-				if rangedM {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+
-						moments[minuteIndex]+" "+mrr[0]+viper.GetString(configStr+"to")+mrr[1], i == 0 && j == 0)
-					translatedString += helper.GetStrIfTrue(mrr[0]+viper.GetString(configStr+"to")+
-						mrr[1], i > 0 || j > 0)
-				}
-				if rangedH {
-					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
-						hrr[1], i == 0 && j == 0)
-					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
-						hrr[1], i > 0 || j > 0)
-				}
-				if !rangedM && !rangedH {
-					pt, err := helper.PrettyTime(hr, min)
-					if err != nil {
-						return err
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+pt, i == 0 && j == 0)
-					translatedString += helper.GetStrIfTrue(pt, i > 0 || j > 0)
-				} else if !rangedH && rangedM {
-					translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+
-						" "+hr, true)
-				} else if rangedH && !rangedM {
-					translatedString += helper.GetStrIfTrue(" "+moments[minuteIndex]+
-						" "+min, true)
-				}
-
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), (listedM || listedH) &&
-					(i < len(mm)-1) || (j < len(hh)-1))
-			}
+		if err := translateMinuteAndHour(); err != nil {
+			return err
 		}
-
 	} else { // checking if  just one of them is default
-		mStr := moments[minuteIndex] // assuming minute is not default
-		mVal := cronSlice[minuteIndex]
-		if mVal == anyValue { //if so
-			hVal := cronSlice[hourIndex]
-			hh, listed := helper.GetList(hVal, ",")
-			for i, hr := range hh {
-				hrr, ranged := helper.GetList(hr, "-")
-				if ranged {
-					hr1, err1 := helper.Get12Hour(hrr[0])
-					hr2, err2 := helper.Get12Hour(hrr[1])
-					if err1 != nil || err2 != nil {
-						return err1
-					}
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hr1+
-						viper.GetString(configStr+"to")+hr2, i == 0)
-					translatedString += helper.GetStrIfTrue(hr1+viper.GetString(configStr+"to")+hr2, i > 0)
-
-				} else {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hr, i == 0)
-					translatedString += helper.GetStrIfTrue(hr, i > 0)
-				}
-
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(hh)-1)
-			}
-		} else {
-			mm, listed := helper.GetList(mVal, ",")
-			for i, min := range mm {
-				mr, ranged := helper.GetList(min, "-")
-				if ranged {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+mStr+" "+mr[0]+
-						viper.GetString(configStr+"to")+mr[1], i == 0)
-					translatedString += helper.GetStrIfTrue(mr[0]+viper.GetString(configStr+"to")+mr[1], i > 0)
-				} else {
-					translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+mStr+" "+mVal, i == 0)
-					translatedString += helper.GetStrIfTrue(min, i > 0)
-				}
-
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(mm)-1)
-			}
-		}
+		translateMinuteOrHour()
 	}
 	return nil
 }
