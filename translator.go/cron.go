@@ -53,9 +53,9 @@ func Validate() url.Values {
 			for _, c := range cc { //iterating because values can be listed
 				vv, ranged := helper.GetList(c, "-")
 				if !helper.IsDigit(c) && !ranged { //the value provided must be a digit
-					errs.Add(moments[i]+" value", "The value must a numeric digit or *")
+					errs.Add(moments[i]+" value", "The value must a positive numeric digit or *")
 				} else if ranged && (!helper.IsDigit(vv[0]) || !helper.IsDigit(vv[1])) {
-					errs.Add(moments[i]+" value", "The value must a numeric digit or *")
+					errs.Add(moments[i]+" value", "The value must a positive numeric digit or *")
 				} else { //checking the validity of the values in the context of each sub-expressions
 					var v, vr1, vr2 int
 					if ranged {
@@ -73,6 +73,9 @@ func Validate() url.Values {
 							if (vr1 < 0 || vr1 > 59) && (vr2 < 0 || vr2 > 59) {
 								errs.Add(minute+" value", "The value must be between 0 to 59")
 							}
+							if vr1 >= vr2 {
+								errs.Add(minute+" value", "The starting range must be lower than the trailing range")
+							}
 						}
 					} else if moments[i] == hour {
 						if (v < 0 || v > 23) && !ranged {
@@ -81,6 +84,9 @@ func Validate() url.Values {
 						if ranged {
 							if (vr1 < 0 || vr1 > 23) && (vr2 < 0 || vr2 > 23) {
 								errs.Add(hour+" value", "The value must be between 0 to 23")
+							}
+							if vr1 >= vr2 {
+								errs.Add(hour+" value", "The starting range must be lower than the trailing range")
 							}
 						}
 					} else if moments[i] == day {
@@ -91,6 +97,9 @@ func Validate() url.Values {
 							if (vr1 < 1 || vr1 > 31) && (vr2 < 1 || vr2 > 31) {
 								errs.Add(day+" value", "The value must be between 1 to 31")
 							}
+							if vr1 >= vr2 {
+								errs.Add(day+" value", "The starting range must be lower than the trailing range")
+							}
 						}
 					} else if moments[i] == month {
 						if (v < 1 || v > 12) && !ranged {
@@ -99,6 +108,9 @@ func Validate() url.Values {
 						if ranged {
 							if (vr1 < 1 || vr1 > 12) && (vr2 < 1 || vr2 > 12) {
 								errs.Add(month+" value", "The value must be between 1 to 12")
+							}
+							if vr1 >= vr2 {
+								errs.Add(month+" value", "The starting range must be lower than the trailing range")
 							}
 						}
 					} else if moments[i] == week {
@@ -109,6 +121,9 @@ func Validate() url.Values {
 						if ranged {
 							if (vr1 < 0 || vr1 > 6) || (vr2 < 0 || vr2 > 6) {
 								errs.Add(week+" value", "The value must be between 0 to 6")
+							}
+							if vr1 >= vr2 {
+								errs.Add(week+" value", "The starting range must be lower than the trailing range")
 							}
 						}
 					}

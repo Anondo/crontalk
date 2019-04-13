@@ -86,7 +86,7 @@ func (t *translator) translateDay() {
 	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1)
 }
 
-func translateMinuteAndHour() error {
+func (t *translator) translateMinuteAndHour() error {
 	m := cronSlice[minuteIndex]
 	h := cronSlice[hourIndex]
 	mm, listedM := helper.GetList(m, ",")
@@ -129,7 +129,7 @@ func translateMinuteAndHour() error {
 	return nil
 }
 
-func translateMinuteOrHour() {
+func (t *translator) translateMinuteOrHour() {
 	mStr := moments[minuteIndex] // assuming minute is not default
 	mVal := cronSlice[minuteIndex]
 	if mVal == anyValue { //if so

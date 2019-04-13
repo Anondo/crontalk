@@ -6,12 +6,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// TODO: Add validation for ranged values like the from range cannot be greater than the to range
-// TODO: refacrot the huge validation code
-// TODO: refactor timeoccurence more if possible
-// TODO: reduce complexity
-// TODO: add step values
-
 const (
 	english = "english"
 	bangla  = "bangla"
@@ -125,14 +119,15 @@ func translateAllButBaseTimeOccurence() error {
 }
 
 func translateTimeOccurence() error {
+	var t translator
 	if cronSlice[minuteIndex] == anyValue && cronSlice[hourIndex] == anyValue { // checking if both hour and minute are defaults
 		translatedString += viper.GetString(configStr + "at_every_minute")
 	} else if cronSlice[minuteIndex] != anyValue && cronSlice[hourIndex] != anyValue { //checking if non of them are
-		if err := translateMinuteAndHour(); err != nil {
+		if err := t.translateMinuteAndHour(); err != nil {
 			return err
 		}
 	} else { // checking if  just one of them is default
-		translateMinuteOrHour()
+		t.translateMinuteOrHour()
 	}
 	return nil
 }
