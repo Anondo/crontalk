@@ -76,17 +76,23 @@ func (t *translator) translateWeekMonth() (bool, error) {
 }
 
 func (t *translator) translateDay() {
+
+	if t.stepped {
+		t.translateStepValues()
+		return
+	}
 	mtext := "every"
 	if !t.base {
 		mtext = "onn"
 	}
 	if t.ranged {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+t.moment+" "+
+		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+viper.GetString(configStr+t.moment)+
 			t.cronRange[0]+viper.GetString(configStr+"to")+t.cronRange[1], t.index == 0)
 		translatedString += helper.GetStrIfTrue(t.cronRange[0]+viper.GetString(configStr+"to")+t.cronRange[1],
 			t.index > 0)
 	} else {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+t.moment+" "+t.cron, t.index == 0)
+		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+viper.GetString(configStr+t.moment)+
+			t.cron, t.index == 0)
 		translatedString += helper.GetStrIfTrue(t.cron, t.index > 0)
 	}
 	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1)
@@ -103,14 +109,14 @@ func (t *translator) translateMinuteAndHour() error {
 			hrr, rangedH := helper.GetList(hr, "-")
 			if rangedM { //if the minute is ranged
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+
-					moments[minuteIndex]+" "+mrr[0]+viper.GetString(configStr+"to")+mrr[1], i == 0 && j == 0)
+					viper.GetString(configStr+"minute")+mrr[0]+viper.GetString(configStr+"to")+mrr[1], i == 0 && j == 0)
 				translatedString += helper.GetStrIfTrue(mrr[0]+viper.GetString(configStr+"to")+
 					mrr[1], i > 0 || j > 0)
 			}
 			if rangedH { // if the hour is ranged
-				translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hrr[0]+viper.GetString(configStr+"to")+
 					hrr[1], i == 0 && j == 0)
-				translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+" "+hrr[0]+viper.GetString(configStr+"to")+
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hrr[0]+viper.GetString(configStr+"to")+
 					hrr[1], i > 0 || j > 0)
 			}
 			if !rangedM && !rangedH { // if none of them are ranged
@@ -121,11 +127,9 @@ func (t *translator) translateMinuteAndHour() error {
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+pt, i == 0 && j == 0)
 				translatedString += helper.GetStrIfTrue(pt, i > 0 || j > 0)
 			} else if !rangedH && rangedM { //or if only the minute is ranged
-				translatedString += helper.GetStrIfTrue(" "+moments[hourIndex]+
-					" "+hr, true)
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hr, true)
 			} else if rangedH && !rangedM { //if only the hour is ranged
-				translatedString += helper.GetStrIfTrue(" "+moments[minuteIndex]+
-					" "+min, true)
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"minute")+min, true)
 			}
 
 			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), (listedM || listedH) &&
@@ -160,11 +164,12 @@ func (t *translator) translateMinuteOrHour() {
 		for i, min := range mm {                //iterating because could be a list
 			mr, ranged := helper.GetList(min, "-")
 			if ranged { //checking if the value is ranged
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+mStr+" "+mr[0]+
-					viper.GetString(configStr+"to")+mr[1], i == 0)
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+viper.GetString(configStr+mStr)+
+					" "+mr[0]+viper.GetString(configStr+"to")+mr[1], i == 0)
 				translatedString += helper.GetStrIfTrue(mr[0]+viper.GetString(configStr+"to")+mr[1], i > 0)
 			} else {
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+mStr+" "+mVal, i == 0)
+				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+viper.GetString(configStr+mStr)+
+					" "+min, i == 0)
 				translatedString += helper.GetStrIfTrue(min, i > 0)
 			}
 
@@ -186,8 +191,18 @@ func (t *translator) translateStepValues() { // TODO: complete this, nothing wor
 	} else {
 		if value == anyValue {
 			if t.moment == week {
-				translatedString += viper.GetString(configStr+"every") + stepValue + t.moment + viper.GetString(configStr+"from") +
-					value + viper.GetString(configStr+"to") + "31"
+				i, _ := strconv.Atoi(stepValue)
+				translatedString += viper.GetString(configStr+"every") + weeks[i] + " "
+			}
+			if t.moment == month {
+				i, _ := strconv.Atoi(stepValue)
+				translatedString += viper.GetString(configStr+"every") + months[i] + " "
+			}
+			if t.moment == day {
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_month")
+			}
+			if t.moment == hour {
+				translatedString += viper.GetString(configStr+"every") + stepValue
 			}
 		}
 	}

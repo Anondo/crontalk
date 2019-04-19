@@ -24,9 +24,6 @@ var (
 func Init() {
 	if viper.GetBool(bangla) {
 		language = bangla
-		moments[dayIndex] = "দিন:" //not taking from config for the sake of simplicity
-		moments[minuteIndex] = "মিনিট:"
-		moments[hourIndex] = "ঘন্টা:"
 	}
 	configStr = "language." + language + "." //the config index to parse the config yaml file from viper
 
@@ -105,6 +102,7 @@ func translateAllButBaseTimeOccurence() error {
 					cronRange:     rr,
 					ranged:        ranged,
 					listed:        listed,
+					stepped:       strings.Contains(c, "/"),
 					base:          false,
 					cronListedLen: len(cc),
 					index:         j,
