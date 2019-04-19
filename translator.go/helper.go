@@ -14,6 +14,7 @@ type translator struct {
 	ranged        bool     //if the sub-expression is ranged
 	listed        bool     //if the sub-expression is listed
 	base          bool     // if the occurence is base
+	stepped       bool     // if the sub-expression contains step values
 	cronListedLen int      //the len of the listed sub-expression
 	index         int      // the current index of the listed sub-expression
 }
@@ -21,6 +22,14 @@ type translator struct {
 func (t *translator) translateWeekMonth() (bool, error) {
 	var v, v1, v2 int
 	var mtext string
+
+	if t.moment != week && t.moment != month {
+		return false, nil
+	}
+	if t.stepped {
+		t.translateStepValues()
+		return true, nil
+	}
 
 	if t.ranged {
 		var err1, err2 error
@@ -37,9 +46,6 @@ func (t *translator) translateWeekMonth() (bool, error) {
 		}
 	}
 
-	if t.moment != week && t.moment != month {
-		return false, nil
-	}
 	if t.base {
 		mtext = "every"
 	}
@@ -163,6 +169,26 @@ func (t *translator) translateMinuteOrHour() {
 			}
 
 			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(mm)-1)
+		}
+	}
+
+}
+
+func (t *translator) translateStepValues() { // TODO: complete this, nothing works
+	steppedCron, _ := helper.GetList(t.cron, "/")
+	stepValue := steppedCron[1]
+	value := steppedCron[0]
+	rValue, ranged := helper.GetList(value, "-")
+
+	if ranged {
+		translatedString += viper.GetString(configStr+"every") + stepValue + t.moment + viper.GetString(configStr+"from") +
+			rValue[0] + viper.GetString(configStr+"to") + rValue[1]
+	} else {
+		if value == anyValue {
+			if t.moment == week {
+				translatedString += viper.GetString(configStr+"every") + stepValue + t.moment + viper.GetString(configStr+"from") +
+					value + viper.GetString(configStr+"to") + "31"
+			}
 		}
 	}
 

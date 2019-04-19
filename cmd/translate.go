@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"crontalk/helper"
+
 	"crontalk/translator.go"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -38,6 +40,11 @@ func translate(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println(translator.GetTranslatedStr())
+	output := translator.GetTranslatedStr()
+
+	if viper.GetBool("bangla") {
+		helper.ChangeDigitLanguage(&output, "bangla") //changing the english digits to bangla
+	}
+	fmt.Println(output)
 
 }

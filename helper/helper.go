@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 // THe app logo
@@ -90,4 +92,16 @@ func GetStrIfTrue(s string, l bool) string {
 		return s
 	}
 	return ""
+}
+
+// ChangeDigitLanguage changes the language of any numeric chars in the string
+func ChangeDigitLanguage(str *string, lang string) {
+	configStr := "language." + lang + "."
+	for _, c := range *str {
+		cs := string(c)
+		if IsDigit(cs) {
+			char := viper.GetString(configStr + cs)
+			*str = strings.Replace(*str, cs, char, -1)
+		}
+	}
 }

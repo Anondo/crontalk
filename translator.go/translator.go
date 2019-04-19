@@ -2,6 +2,7 @@ package translator
 
 import (
 	"crontalk/helper"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -67,6 +68,7 @@ func translateBaseOccurence() error {
 					cronRange:     rr,
 					ranged:        ranged,
 					listed:        listed,
+					stepped:       strings.Contains(c, "/"),
 					base:          true,
 					cronListedLen: len(cc),
 					index:         j,

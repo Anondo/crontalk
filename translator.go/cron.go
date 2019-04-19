@@ -51,6 +51,9 @@ func Validate() url.Values {
 		if cronSlice[i] != anyValue {
 			cc, _ := helper.GetList(cronSlice[i], ",")
 			for _, c := range cc { //iterating because values can be listed
+				if strings.Contains(c, "/") {
+					break //validation for step values for go here
+				}
 				vv, ranged := helper.GetList(c, "-")
 				if !helper.IsDigit(c) && !ranged { //the value provided must be a digit
 					errs.Add(moments[i]+" value", "The value must a positive numeric digit or *")
