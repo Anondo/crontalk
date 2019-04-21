@@ -105,3 +105,41 @@ func ChangeDigitLanguage(str *string, lang string) {
 		}
 	}
 }
+
+// AddOrdinals add ordinal indicators  like 1 -> 1st 2 -> 2nd and so on
+func AddOrdinals(s string) string {
+	theNumber := ""
+	ss := strings.Split(s, "")
+	for i := 0; i < len(ss)-1; i++ { // cant go to the last element because s[i+1] will produce runtime error
+		c := ss[i]
+		nextC := ss[i+1]
+		if IsDigit(c) {
+			theNumber += c
+			if IsDigit(nextC) {
+				continue
+			} else if nextC == " " {
+				newC := addOrdinalIndicator(c)
+				ss[i] = newC
+				theNumber = ""
+			} else {
+				theNumber = ""
+			}
+		}
+
+	}
+	return strings.Join(ss, "")
+}
+
+func addOrdinalIndicator(s string) string {
+	switch s {
+	case "1":
+		s += "st"
+	case "2":
+		s += "nd"
+	case "3":
+		s += "rd"
+	default:
+		s += "th"
+	}
+	return s
+}

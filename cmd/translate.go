@@ -41,10 +41,14 @@ func translate(cmd *cobra.Command, args []string) {
 	}
 
 	output := translator.GetTranslatedStr()
+	output = helper.TrimExtraSpaces(output)
 
 	if viper.GetBool("bangla") {
 		helper.ChangeDigitLanguage(&output, "bangla") //changing the english digits to bangla
 	}
+
+	output = helper.AddOrdinals(output)
+
 	fmt.Println(output)
 
 }

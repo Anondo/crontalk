@@ -185,26 +185,57 @@ func (t *translator) translateStepValues() { // TODO: complete this, nothing wor
 	value := steppedCron[0]
 	rValue, ranged := helper.GetList(value, "-")
 
-	if ranged {
-		translatedString += viper.GetString(configStr+"every") + stepValue + t.moment + viper.GetString(configStr+"from") +
-			rValue[0] + viper.GetString(configStr+"to") + rValue[1]
-	} else {
-		if value == anyValue {
+	if ranged { //if ranged, instead of a default stopping range like normal(i.e 2/2) ones, the ranged value will be given
+		if t.moment == week {
+			i1, _ := strconv.Atoi(rValue[0])
+			i2, _ := strconv.Atoi(rValue[1])
+			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
+				viper.GetString(configStr+"from") + weeks[i1] + viper.GetString(configStr+"to") + weeks[i2]
+		}
+		if t.moment == month {
+			i1, _ := strconv.Atoi(rValue[0])
+			i2, _ := strconv.Atoi(rValue[1])
+			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
+				viper.GetString(configStr+"from") + months[i1] + viper.GetString(configStr+"to") + months[i2]
+		}
+		if t.moment == day {
+			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_month") +
+				viper.GetString(configStr+"from") + rValue[0] + viper.GetString(configStr+"to") + rValue[1]
+		}
+	} else { //if not ranged
+		if value == anyValue { //if */<step-value>
 			if t.moment == week {
-				i, _ := strconv.Atoi(stepValue)
-				translatedString += viper.GetString(configStr+"every") + weeks[i] + " "
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
+					" "
 			}
 			if t.moment == month {
-				i, _ := strconv.Atoi(stepValue)
-				translatedString += viper.GetString(configStr+"every") + months[i] + " "
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
+					" "
 			}
 			if t.moment == day {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_month")
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_month")
 			}
-			if t.moment == hour {
-				translatedString += viper.GetString(configStr+"every") + stepValue
+		} else { //if example: 5/<step-value>
+			if t.moment == week {
+				i, _ := strconv.Atoi(value)
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
+					viper.GetString(configStr+"from") + weeks[i] + viper.GetString(configStr+"to") +
+					viper.GetString(configStr+"sunday")
 			}
+			if t.moment == month {
+				i, _ := strconv.Atoi(value)
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
+					viper.GetString(configStr+"from") + months[i] + viper.GetString(configStr+"to") +
+					viper.GetString(configStr+"december")
+			}
+			if t.moment == day {
+				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_month") +
+					viper.GetString(configStr+"from") + value + viper.GetString(configStr+"to") + "31"
+			}
+
 		}
 	}
+
+	translatedString += " , "
 
 }
