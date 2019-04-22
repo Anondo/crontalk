@@ -143,3 +143,13 @@ func addOrdinalIndicator(s string) string {
 	}
 	return s
 }
+
+// IndexOf returns the index of the first occurence of the element matched in the string slice
+func IndexOf(ss []string, e string) int {
+	for i, s := range ss {
+		if s == e {
+			return i
+		}
+	}
+	return -1
+}

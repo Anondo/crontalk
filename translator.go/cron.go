@@ -3,7 +3,6 @@ package translator
 import (
 	"crontalk/helper"
 	"net/url"
-	"strconv"
 	"strings"
 )
 
@@ -51,86 +50,15 @@ func Validate() url.Values {
 		if cronSlice[i] != anyValue {
 			cc, _ := helper.GetList(cronSlice[i], ",")
 			for _, c := range cc { //iterating because values can be listed
-				if strings.Contains(c, "/") {
-					break //validation for step values for go here
+				if strings.Contains(c, "/"){ // if the expression is a stepped value
+					validateSteppedSubExpression(&errs , c , moments[i]) // validate just the step value
 				}
-				vv, ranged := helper.GetList(c, "-")
-				if !helper.IsDigit(c) && !ranged { //the value provided must be a digit
-					errs.Add(moments[i]+" value", "The value must a positive numeric digit or *")
-				} else if ranged && (!helper.IsDigit(vv[0]) || !helper.IsDigit(vv[1])) {
-					errs.Add(moments[i]+" value", "The value must a positive numeric digit or *")
-				} else { //checking the validity of the values in the context of each sub-expressions
-					var v, vr1, vr2 int
-					if ranged {
-						vr1, _ = strconv.Atoi(vv[0])
-						vr2, _ = strconv.Atoi(vv[1])
-					} else {
-						v, _ = strconv.Atoi(c)
-					}
-
-					if moments[i] == minute {
-						if (v < 0 || v > 59) && !ranged {
-							errs.Add(minute+" value", "The value must be between 0 to 59")
-						}
-						if ranged {
-							if (vr1 < 0 || vr1 > 59) && (vr2 < 0 || vr2 > 59) {
-								errs.Add(minute+" value", "The value must be between 0 to 59")
-							}
-							if vr1 >= vr2 {
-								errs.Add(minute+" value", "The starting range must be lower than the trailing range")
-							}
-						}
-					} else if moments[i] == hour {
-						if (v < 0 || v > 23) && !ranged {
-							errs.Add(hour+" value", "The value must be between 0 to 23")
-						}
-						if ranged {
-							if (vr1 < 0 || vr1 > 23) && (vr2 < 0 || vr2 > 23) {
-								errs.Add(hour+" value", "The value must be between 0 to 23")
-							}
-							if vr1 >= vr2 {
-								errs.Add(hour+" value", "The starting range must be lower than the trailing range")
-							}
-						}
-					} else if moments[i] == day {
-						if (v < 1 || v > 31) && !ranged {
-							errs.Add(day+" value", "The value must be between 1 to 31")
-						}
-						if ranged {
-							if (vr1 < 1 || vr1 > 31) && (vr2 < 1 || vr2 > 31) {
-								errs.Add(day+" value", "The value must be between 1 to 31")
-							}
-							if vr1 >= vr2 {
-								errs.Add(day+" value", "The starting range must be lower than the trailing range")
-							}
-						}
-					} else if moments[i] == month {
-						if (v < 1 || v > 12) && !ranged {
-							errs.Add(month+" value", "The value must be between 1 to 12")
-						}
-						if ranged {
-							if (vr1 < 1 || vr1 > 12) && (vr2 < 1 || vr2 > 12) {
-								errs.Add(month+" value", "The value must be between 1 to 12")
-							}
-							if vr1 >= vr2 {
-								errs.Add(month+" value", "The starting range must be lower than the trailing range")
-							}
-						}
-					} else if moments[i] == week {
-
-						if (v < 0 || v > 6) && !ranged {
-							errs.Add(week+" value", "The Value must be between 0 to 6")
-						}
-						if ranged {
-							if (vr1 < 0 || vr1 > 6) || (vr2 < 0 || vr2 > 6) {
-								errs.Add(week+" value", "The value must be between 0 to 6")
-							}
-							if vr1 >= vr2 {
-								errs.Add(week+" value", "The starting range must be lower than the trailing range")
-							}
-						}
-					}
+				slashIndex := helper.IndexOf(strings.Split(c,"") , "/")
+				if slashIndex != -1{ // just validate everything apart from the step values
+					c = c[:slashIndex]
 				}
+				validateSubExpressions(&errs, moments[i], c)
+
 			}
 
 		}
