@@ -57,7 +57,9 @@ func Validate() url.Values {
 				if slashIndex != -1{ // just validate everything apart from the step values
 					c = c[:slashIndex]
 				}
-				validateSubExpressions(&errs, moments[i], c)
+				if c != anyValue{
+					validateSubExpressions(&errs, moments[i], c)
+				}
 
 			}
 
