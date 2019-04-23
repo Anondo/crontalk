@@ -7,7 +7,7 @@ import (
 )
 
 func validateSubExpressions(errs *url.Values, moment, c string) {
-	vv, ranged := helper.GetList(c, "-")
+	vv, ranged := helper.GetList(c, rangee)
 	if !helper.IsDigit(c) && !ranged { //the value provided must be a digit
 		errs.Add(moment+" value", "The value must a positive numeric digit or *")
 	} else if ranged && (!helper.IsDigit(vv[0]) || !helper.IsDigit(vv[1])) {
@@ -87,7 +87,7 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 }
 
 func validateSteppedSubExpression(errs *url.Values, se, moment string) {
-	steppedCron, _ := helper.GetList(se, "/")
+	steppedCron, _ := helper.GetList(se, step)
 	stepValue := steppedCron[1]
 	val, err := strconv.Atoi(stepValue)
 

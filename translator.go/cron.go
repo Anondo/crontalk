@@ -18,6 +18,9 @@ const (
 	hour        = "Hour"
 	minute      = "Minute"
 	anyValue    = "*"
+	rangee = "-"
+	step = "/"
+	list = ","
 )
 
 var (
@@ -48,12 +51,12 @@ func Validate() url.Values {
 	// checking the values provided for the expression
 	for i := minuteIndex; i <= weekIndex; i++ {
 		if cronSlice[i] != anyValue {
-			cc, _ := helper.GetList(cronSlice[i], ",")
+			cc, _ := helper.GetList(cronSlice[i], list)
 			for _, c := range cc { //iterating because values can be listed
-				if strings.Contains(c, "/"){ // if the expression is a stepped value
+				if strings.Contains(c, step){ // if the expression is a stepped value
 					validateSteppedSubExpression(&errs , c , moments[i]) // validate just the step value
 				}
-				slashIndex := helper.IndexOf(strings.Split(c,"") , "/")
+				slashIndex := helper.IndexOf(strings.Split(c,"") , step)
 				if slashIndex != -1{ // just validate everything apart from the step values
 					c = c[:slashIndex]
 				}

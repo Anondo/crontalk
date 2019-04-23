@@ -102,26 +102,26 @@ func (t *translator) translateDay() {
 func (t *translator) translateMinuteAndHour() error {
 	m := cronSlice[minuteIndex]
 	h := cronSlice[hourIndex]
-	mm, listedM := helper.GetList(m, ",")
-	hh, listedH := helper.GetList(h, ",")
+	mm, listedM := helper.GetList(m, list)
+	hh, listedH := helper.GetList(h, list)
 	for i, min := range mm { // nested loops are required as, if both the minute & hour values are listed ,the
 		for j, hr := range hh { //time is be shown as, for each minute the listed hours
 			steppedHour := false
 			steppedMinute := false
-			if strings.Contains(min, "/") { // if the minute is stepped
+			if strings.Contains(min, step) { // if the minute is stepped
 				t.cron = min
 				t.moment = minute
 				t.translateStepValues()
 				steppedMinute = true
 			}
-			if strings.Contains(hr, "/") { // if the hour is stepped
+			if strings.Contains(hr, step) { // if the hour is stepped
 				t.cron = hr
 				t.moment = hour
 				t.translateStepValues()
 				steppedHour = true
 			}
-			mrr, rangedM := helper.GetList(min, "-")
-			hrr, rangedH := helper.GetList(hr, "-")
+			mrr, rangedM := helper.GetList(min, rangee)
+			hrr, rangedH := helper.GetList(hr, rangee)
 			if rangedM { //if the minute is ranged
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+
 					viper.GetString(configStr+"minute")+mrr[0]+viper.GetString(configStr+"to")+mrr[1], i == 0 && j == 0)
@@ -159,16 +159,16 @@ func (t *translator) translateMinuteOrHour() {
 	mVal := cronSlice[minuteIndex]
 	if mVal == anyValue { //if default
 		hVal := cronSlice[hourIndex] // working with the hour only
-		hh, listed := helper.GetList(hVal, ",")
+		hh, listed := helper.GetList(hVal, list)
 		for i, hr := range hh { // iterating because could be a list
-			if strings.Contains(hr, "/") { // if the hour is stepped
+			if strings.Contains(hr, step) { // if the hour is stepped
 				t.cron = hr
 				t.moment = hour
 				translatedString += viper.GetString(configStr + "at_every_minute") // as the minute is * and minute will not be parsed later in this function
 				t.translateStepValues()
 				continue
 			}
-			hrr, ranged := helper.GetList(hr, "-")
+			hrr, ranged := helper.GetList(hr, rangee)
 			if ranged { // checking if the value is ranged , different output if so
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hrr[0]+
 					viper.GetString(configStr+"to")+hrr[1], i == 0)
@@ -182,15 +182,15 @@ func (t *translator) translateMinuteOrHour() {
 			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(hh)-1)
 		}
 	} else {
-		mm, listed := helper.GetList(mVal, ",") // working with minute only
-		for i, min := range mm {                //iterating because could be a list
-			if strings.Contains(min, "/") { // if the minute is stepped
+		mm, listed := helper.GetList(mVal, list) // working with minute only
+		for i, min := range mm {                 //iterating because could be a list
+			if strings.Contains(min, step) { // if the minute is stepped
 				t.cron = min
 				t.moment = minute
 				t.translateStepValues()
 				continue
 			}
-			mr, ranged := helper.GetList(min, "-")
+			mr, ranged := helper.GetList(min, rangee)
 			if ranged { //checking if the value is ranged
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+viper.GetString(configStr+mStr)+
 					" "+mr[0]+viper.GetString(configStr+"to")+mr[1], i == 0)
@@ -208,10 +208,10 @@ func (t *translator) translateMinuteOrHour() {
 }
 
 func (t *translator) translateStepValues() {
-	steppedCron, _ := helper.GetList(t.cron, "/")
+	steppedCron, _ := helper.GetList(t.cron, step)
 	stepValue := steppedCron[1]
 	value := steppedCron[0]
-	rValue, ranged := helper.GetList(value, "-")
+	rValue, ranged := helper.GetList(value, rangee)
 
 	translatedString += " " //adding a space for optical optimization
 

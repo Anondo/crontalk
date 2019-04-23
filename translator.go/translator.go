@@ -56,16 +56,16 @@ func translateBaseOccurence() error {
 	var i int
 	for i = weekIndex; i > hourIndex; i-- { //start iterating from the last sub-expressions to determine the starting string
 		if cronSlice[i] != anyValue {
-			cc, listed := helper.GetList(cronSlice[i], ",")
+			cc, listed := helper.GetList(cronSlice[i], list)
 			for j, c := range cc { //iterating because values can be listed
-				rr, ranged := helper.GetList(c, "-")
+				rr, ranged := helper.GetList(c, rangee)
 				t := translator{
 					cron:          c,
 					moment:        moments[i],
 					cronRange:     rr,
 					ranged:        ranged,
 					listed:        listed,
-					stepped:       strings.Contains(c, "/"),
+					stepped:       strings.Contains(c, step),
 					base:          true,
 					cronListedLen: len(cc),
 					index:         j,
@@ -93,16 +93,16 @@ func translateAllButBaseTimeOccurence() error {
 
 	for i := dayIndex; i <= weekIndex; i++ { //checking every other sub-expressions apart from the base and time, no need for reverse travel
 		if cronSlice[i] != anyValue && i != baseIndex { //not gonna check the base
-			cc, listed := helper.GetList(cronSlice[i], ",")
+			cc, listed := helper.GetList(cronSlice[i], list)
 			for j, c := range cc { //iterating the single sub-expressions
-				rr, ranged := helper.GetList(c, "-")
+				rr, ranged := helper.GetList(c, rangee)
 				t := translator{
 					cron:          c,
 					moment:        moments[i],
 					cronRange:     rr,
 					ranged:        ranged,
 					listed:        listed,
-					stepped:       strings.Contains(c, "/"),
+					stepped:       strings.Contains(c, step),
 					base:          false,
 					cronListedLen: len(cc),
 					index:         j,
