@@ -24,8 +24,12 @@ Valid Cron Expressions:
 -----------------------
   "* * * * *" = "(minute) (hour) (day of month) (month) (day of week)"
 1.Should contain exactly 5 values/sub-expressions
-2.Values ar only limited to numeric digits for now
-
+2. Valid values are:
+		minute: 0-59
+		hour:   0-23
+		day of month: 1-31
+		month: 1-12 or jan-dec
+		day of week: 0-6 or sun-sat
 		`,
 	}
 )

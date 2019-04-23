@@ -4,10 +4,60 @@ import (
 	"crontalk/helper"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
+var (
+	validMonthValueWords = map[string]string{
+		"jan": "1",
+		"feb": "2",
+		"mar": "3",
+		"apr": "4",
+		"may": "5",
+		"jun": "6",
+		"jul": "7",
+		"aug": "8",
+		"sep": "9",
+		"oct": "10",
+		"nov": "11",
+		"dec": "12",
+	}
+	validWeekValueWords = map[string]string{
+		"sun": "0",
+		"mon": "1",
+		"tue": "2",
+		"wed": "3",
+		"thu": "4",
+		"fri": "5",
+		"sat": "6",
+	}
+)
+
+func validWordParse(s *string, moment string) {
+	*s = strings.ToLower(*s)
+	if moment == week {
+		if v, exist := validWeekValueWords[*s]; exist {
+			*s = v
+		}
+	}
+	if moment == month {
+		if v, exist := validMonthValueWords[*s]; exist {
+			*s = v
+		}
+	}
+}
+
 func validateSubExpressions(errs *url.Values, moment, c string) {
+	if moment == week || moment == month { // if a valid word is provided on week or month(only capable)
+		validWordParse(&c, moment)
+	}
 	vv, ranged := helper.GetList(c, rangee)
+	if ranged && (moment == week || moment == month) { // ranged parse for valid words on week or month
+		validWordParse(&vv[0], moment)
+		validWordParse(&vv[1], moment)
+
+	}
+
 	if !helper.IsDigit(c) && !ranged { //the value provided must be a digit
 		errs.Add(moment+" value", "The value must a positive numeric digit or *")
 	} else if ranged && (!helper.IsDigit(vv[0]) || !helper.IsDigit(vv[1])) {
@@ -59,11 +109,11 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 			}
 		} else if moment == month {
 			if (v < 1 || v > 12) && !ranged {
-				errs.Add(month+" value", "The value must be between 1 to 12")
+				errs.Add(month+" value", "The value must be between 1 to 12 or jan-dec")
 			}
 			if ranged {
 				if (vr1 < 1 || vr1 > 12) && (vr2 < 1 || vr2 > 12) {
-					errs.Add(month+" value", "The value must be between 1 to 12")
+					errs.Add(month+" value", "The value must be between 1 to 12 or jan-dec")
 				}
 				if vr1 >= vr2 {
 					errs.Add(month+" value", "The starting range must be lower than the trailing range")
@@ -72,11 +122,11 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 		} else if moment == week {
 
 			if (v < 0 || v > 6) && !ranged {
-				errs.Add(week+" value", "The Value must be between 0 to 6")
+				errs.Add(week+" value", "The Value must be between 0 to 6 or sun-sat")
 			}
 			if ranged {
 				if (vr1 < 0 || vr1 > 6) || (vr2 < 0 || vr2 > 6) {
-					errs.Add(week+" value", "The value must be between 0 to 6")
+					errs.Add(week+" value", "The value must be between 0 to 6 or sun-sat")
 				}
 				if vr1 >= vr2 {
 					errs.Add(week+" value", "The starting range must be lower than the trailing range")

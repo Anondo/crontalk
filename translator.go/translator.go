@@ -58,7 +58,12 @@ func translateBaseOccurence() error {
 		if cronSlice[i] != anyValue {
 			cc, listed := helper.GetList(cronSlice[i], list)
 			for j, c := range cc { //iterating because values can be listed
+				validWordParse(&c, moments[i])
 				rr, ranged := helper.GetList(c, rangee)
+				if ranged && (moments[i] == week || moments[i] == month) {
+					validWordParse(&rr[0], moments[i])
+					validWordParse(&rr[1], moments[i])
+				}
 				t := translator{
 					cron:          c,
 					moment:        moments[i],
@@ -95,7 +100,12 @@ func translateAllButBaseTimeOccurence() error {
 		if cronSlice[i] != anyValue && i != baseIndex { //not gonna check the base
 			cc, listed := helper.GetList(cronSlice[i], list)
 			for j, c := range cc { //iterating the single sub-expressions
+				validWordParse(&c, moments[i])
 				rr, ranged := helper.GetList(c, rangee)
+				if ranged && (moments[i] == week || moments[i] == month) {
+					validWordParse(&rr[0], moments[i])
+					validWordParse(&rr[1], moments[i])
+				}
 				t := translator{
 					cron:          c,
 					moment:        moments[i],
