@@ -82,7 +82,7 @@ func (t *translator) translateDay() {
 		t.translateStepValues()
 		return
 	}
-	mtext := "every"
+	mtext := "every" //setting the starting text for translation
 	if !t.base {
 		mtext = "onn"
 	}
@@ -106,18 +106,19 @@ func (t *translator) translateMinuteAndHour() error {
 	hh, listedH := helper.GetList(h, ",")
 	for i, min := range mm { // nested loops are required as, if both the minute & hour values are listed ,the
 		for j, hr := range hh { //time is be shown as, for each minute the listed hours
-			if strings.Contains(min, "/") {
+			steppedHour := false
+			steppedMinute := false
+			if strings.Contains(min, "/") { // if the minute is stepped
 				t.cron = min
 				t.moment = minute
 				t.translateStepValues()
+				steppedMinute = true
 			}
-			if strings.Contains(hr, "/") {
+			if strings.Contains(hr, "/") { // if the hour is stepped
 				t.cron = hr
 				t.moment = hour
 				t.translateStepValues()
-			}
-			if strings.Contains(min, "/") || strings.Contains(hr, "/") {
-				continue // FIXME: "2 */8 * * *" this expression will not be parsed properly, as getting stepped hour will continue and minute wont be parsed
+				steppedHour = true
 			}
 			mrr, rangedM := helper.GetList(min, "-")
 			hrr, rangedH := helper.GetList(hr, "-")
@@ -133,16 +134,16 @@ func (t *translator) translateMinuteAndHour() error {
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hrr[0]+viper.GetString(configStr+"to")+
 					hrr[1], i > 0 || j > 0)
 			}
-			if !rangedM && !rangedH { // if none of them are ranged
+			if !rangedM && !rangedH && !steppedHour && !steppedMinute { // if none of them are ranged or stepped then print like a normal time
 				pt, err := helper.PrettyTime(hr, min)
 				if err != nil {
 					return err
 				}
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+pt, i == 0 && j == 0)
 				translatedString += helper.GetStrIfTrue(pt, i > 0 || j > 0)
-			} else if !rangedH && rangedM { //or if only the minute is ranged
+			} else if (!rangedH && !steppedHour) && (rangedM || steppedMinute) { //or if only the minute is ranged or stepped
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hr, true)
-			} else if rangedH && !rangedM { //if only the hour is ranged
+			} else if (rangedH || steppedHour) && (!rangedM && !steppedMinute) { //if only the hour is ranged or stepped
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"minute")+min, true)
 			}
 
@@ -156,10 +157,17 @@ func (t *translator) translateMinuteAndHour() error {
 func (t *translator) translateMinuteOrHour() {
 	mStr := moments[minuteIndex] // assuming minute is not default
 	mVal := cronSlice[minuteIndex]
-	if mVal == anyValue { //if so
+	if mVal == anyValue { //if default
 		hVal := cronSlice[hourIndex] // working with the hour only
 		hh, listed := helper.GetList(hVal, ",")
 		for i, hr := range hh { // iterating because could be a list
+			if strings.Contains(hr, "/") { // if the hour is stepped
+				t.cron = hr
+				t.moment = hour
+				translatedString += viper.GetString(configStr + "at_every_minute") // as the minute is * and minute will not be parsed later in this function
+				t.translateStepValues()
+				continue
+			}
 			hrr, ranged := helper.GetList(hr, "-")
 			if ranged { // checking if the value is ranged , different output if so
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hrr[0]+
@@ -176,6 +184,12 @@ func (t *translator) translateMinuteOrHour() {
 	} else {
 		mm, listed := helper.GetList(mVal, ",") // working with minute only
 		for i, min := range mm {                //iterating because could be a list
+			if strings.Contains(min, "/") { // if the minute is stepped
+				t.cron = min
+				t.moment = minute
+				t.translateStepValues()
+				continue
+			}
 			mr, ranged := helper.GetList(min, "-")
 			if ranged { //checking if the value is ranged
 				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+viper.GetString(configStr+mStr)+
@@ -274,6 +288,8 @@ func (t *translator) translateStepValues() {
 		}
 	}
 
-	translatedString += " , "
+	if t.moment != minute && t.moment != hour {
+		translatedString += " , "
+	}
 
 }
