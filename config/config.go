@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"log"
 
 	"github.com/spf13/viper"
@@ -8,10 +9,12 @@ import (
 
 // LoadConfig loads the configuration file for the viper to parse
 func LoadConfig() {
-	viper.SetConfigName("config")
+	cfgByte, err := Asset("config.yml")
+	if err != nil {
+		log.Fatal("Failed to read config file: ", err.Error())
+	}
 	viper.SetConfigType("yml")
-	viper.AddConfigPath(".")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal("Failed to read config file")
+	if err := viper.ReadConfig(bytes.NewBuffer(cfgByte)); err != nil {
+		log.Fatal("Failed to read config file: ", err.Error())
 	}
 }
