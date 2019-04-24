@@ -38,6 +38,7 @@ func init() {
 	config.LoadConfig()
 	RootCmd.AddCommand(translateCmd)
 	RootCmd.AddCommand(nextCmd)
+	RootCmd.AddCommand(serveCmd)
 }
 
 // Execute the root command

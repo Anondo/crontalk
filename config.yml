@@ -1,3 +1,5 @@
+app:
+  port: 8008
 language:
   english:
     every: "Every "
