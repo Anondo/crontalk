@@ -18,6 +18,7 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Couldnt read request body")
+		log.Printf("%s %d http://%s%s\n", r.Method, http.StatusBadRequest, r.Host, r.URL.Path)
 		return
 	}
 
@@ -30,6 +31,7 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 		for k, v := range vErr {
 			fmt.Fprintf(w, "%v: %v\n", k, v)
 		}
+		log.Printf("%s %d http://%s%s\n", r.Method, http.StatusBadRequest, r.Host, r.URL.Path)
 		return
 	}
 
@@ -49,5 +51,5 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, output)
-	log.Printf("%s %d %s %s\n", r.Method, http.StatusOK, r.Host, r.URL.Path)
+	log.Printf("%s %d http://%s%s\n", r.Method, http.StatusOK, r.Host, r.URL.Path)
 }
