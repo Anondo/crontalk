@@ -5,7 +5,7 @@ $(document).ready(function(){
   $("#expression").bind("keyup",function(){
     var expr = $("#expression").val();
     $.post(url , JSON.stringify({expression: expr}) , function(response , status){
-      $("#result").val("");
+      $("#result").val('');
       $("#result").val(response);
     });
   });

@@ -6,12 +6,17 @@
     <title>Crontalk</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="js/translate.js"></script>
+    <link rel="stylesheet" href="css/styles.css"/>
   </head>
 
   <body>
     <h1>CronTalk</h1>
-    <textarea id="expression">* * * * *</textarea>
-    <textarea id="result" readonly></textarea>
+    <div class="expression_bubble">
+      <textarea id="expression">* * * * *</textarea>
+    </div>
+    <div class="talkbubble">
+      <textarea id="result" readonly></textarea>
+    </div>
 
 
   </body>

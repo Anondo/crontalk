@@ -1,0 +1,90 @@
+body {
+  margin: 50px;
+  color: #333;
+  font-family: Verdana, sans-serif;
+  font-size: 16px;
+  background-color: Black;
+}
+h1{
+  text-align: center;
+}
+
+.expression_bubble {
+  position: relative;
+  width: 290px;
+  height: 125px;
+
+  padding: 10px;
+  border-radius: 5px;
+  border: solid lightblue;
+  background: lightblue;
+}
+
+.expression_bubble:before {
+  content:"";
+  position: absolute;
+  right: 100%;
+  top: 26px;
+  width: 0;
+  height: 0;
+
+  border-top: 13px solid transparent;
+  border-right: 26px solid lightblue;
+  border-bottom: 13px solid transparent;
+}
+
+.expression_bubble textarea {
+  position: inherit;
+  width: inherit;
+  height: inherit;
+  background: inherit;
+
+  font-size: 50px;
+
+
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  resize: none;
+}
+
+.talkbubble {
+  position: relative;
+  width: 300px;
+  height: 125px;
+
+  float: right;
+
+
+  padding: 10px;
+  border-radius: 5px;
+  border: solid lightblue;
+  background: lightblue;
+}
+
+.talkbubble:before {
+  content:"";
+  position: absolute;
+  left: 100%;
+  top: 26px;
+  width: 0;
+  height: 0;
+
+  border-top: 13px solid transparent;
+  border-left: 26px solid lightblue;
+  border-bottom: 13px solid transparent;
+}
+
+.talkbubble textarea {
+  position: inherit;
+  width: inherit;
+  height: inherit;
+  background: inherit;
+
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  resize: none;
+}
