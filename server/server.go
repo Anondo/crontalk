@@ -20,7 +20,7 @@ func StartServer() {
 
 	port := viper.GetInt("port")
 	http.HandleFunc("/crontalk/translate", translateHandler)
-	http.Handle("/", http.FileServer(http.Dir("./assets")))
+	http.HandleFunc("/", templateHandler)
 	go func() {
 		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 			log.Fatal("Failed to start crontalk server: ", err.Error())

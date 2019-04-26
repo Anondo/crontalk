@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"crontalk/binded"
 	"log"
 
 	"github.com/spf13/viper"
@@ -19,7 +20,7 @@ func LoadConfig() {
 }
 
 func readFromBindedConfig() error {
-	cfgByte, err := Asset("confsdig.yml")
+	cfgByte, err := binded.Asset("config.yml")
 	if err != nil {
 		return err
 	}

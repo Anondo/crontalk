@@ -1,3 +1,3 @@
 #! /bin/sh
 
-go-bindata config.yml
+go-bindata -pkg binded -o bindata.go config.yml assets/... ; mv bindata.go binded/

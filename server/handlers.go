@@ -1,9 +1,12 @@
 package server
 
 import (
+	"bytes"
+	"crontalk/binded"
 	"crontalk/helper"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -32,11 +35,13 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "%v: %v\n", k, v)
 		}
 		log.Printf("%s %d http://%s%s\n", r.Method, http.StatusBadRequest, r.Host, r.URL.Path)
+		translator.GetTranslatedStr()
 		return
 	}
 
 	if err := translator.Translate(); err != nil {
 		log.Println(err.Error())
+		translator.GetTranslatedStr()
 		return
 	}
 
@@ -52,4 +57,30 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, output)
 	log.Printf("%s %d http://%s%s\n", r.Method, http.StatusOK, r.Host, r.URL.Path)
+}
+
+func templateHandler(w http.ResponseWriter, r *http.Request) {
+	ast := binded.GetAssets()
+	data := struct {
+		Assets binded.Assets
+	}{
+		Assets: ast,
+	}
+	tm := template.New("main")
+	tm.Delims("@{{", "}}@")
+	tm.Funcs(template.FuncMap{
+		"html": binded.HTML,
+		"css":  binded.CSS,
+		"js":   binded.JS,
+	})
+	t, err := tm.Parse(ast.IndexHTML)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	buf := new(bytes.Buffer)
+	if err := t.Execute(buf, data); err != nil {
+		log.Fatal(err.Error())
+	}
+	w.Header().Add("Content-Type", "text/html")
+	w.Write(buf.Bytes())
 }
