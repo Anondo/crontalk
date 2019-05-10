@@ -15,6 +15,10 @@ import (
 )
 
 func translateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	req := struct {
 		Exprsn string `json:"expression"`
 	}{}
@@ -60,6 +64,7 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func templateHandler(w http.ResponseWriter, r *http.Request) {
+
 	ast := binded.GetAssets()
 	data := struct {
 		Assets binded.Assets
