@@ -31,8 +31,11 @@ func translate(cmd *cobra.Command, args []string) {
 	translator.Init()
 
 	if vErr := translator.Validate(); len(vErr) != 0 {
-		for k, v := range vErr {
-			fmt.Printf("%v: %v\n", k, v)
+		for en, ev := range vErr {
+			fmt.Printf("%v:\n", en)
+			for i, e := range ev {
+				fmt.Printf("%d.%v\n", i+1, e)
+			}
 		}
 		return
 	}
