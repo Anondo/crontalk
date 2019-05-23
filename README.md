@@ -77,6 +77,7 @@ A command called ```serve``` will soon be fully working(hopefully on the next re
 1. Should contain exactly 5 values/sub-expressions
 
 1. Valid values are:
+
                       minute: 0-59
 
                       hour:   0-23
