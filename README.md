@@ -37,8 +37,8 @@ If you can see the version of the app then you are good to go!.
 Translate any cron expressions like this,
 ```
 $ crontalk translate --cron="6 12 * * *"
-
 ```
+
 And the result will be ```Every Day At 12:06PM```.
 
 Also **CronTalk** supports multiple languages (english & bangla for now with english being the default). So try,
@@ -54,10 +54,10 @@ And you will get something like ```প্রতিদিন সময় ১২:
 List the next occurrence(s) for a cron expression,
 ```
 $ crontalk next --cron="6 12 * * *" -o 5
-
 ```
 
 Doing this will give you
+
 ```
 2019-05-23 12:06PM
 2019-05-24 12:06PM
@@ -77,13 +77,21 @@ A command called ```serve``` will soon be fully working(hopefully on the next re
 1. Should contain exactly 5 values/sub-expressions
 
 1. Valid values are:
+2.
                       minute: 0-59
+
                       hour:   0-23
+
                       day of month: 1-31
+
                       month: 1-12 or jan-dec
+
                       day of week: 0-6 or sun-sat
+
                       list values example: 1,2,3
+
                       range values example: 1-4 , mon-thu
+
                       step values example: 1/8
 
 ### Contributing
