@@ -18,7 +18,7 @@ CronTalk: Talk to the cron expressions!!
 ------------------------------------------
 
 Translate your cron expressions into very understandable english words.
-Scan the expression for future occurences.
+Scan the expression for future occurrences.
 
 Valid Cron Expressions:
 -----------------------
