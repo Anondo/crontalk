@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Crontalk</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">@{{ .Assets.TranslateJS | js }}@</script>
+    <style>@{{ .Assets.StylesCSS | css }}@</style>
+  </head>
+
+  <body>
+    <h1>CronTalk</h1>
+    <div class="expression_bubble">
+      <span>Expression:</span>
+      <textarea id="expression">* * * * *</textarea>
+    </div>
+    <div class="talkbubble">
+      <span>Translation:</span>
+      <textarea id="result" readonly></textarea>
+    </div>
+
+
+  </body>
+</html>

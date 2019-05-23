@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	translator "crontalk/translator.go"
+	translator "crontalk/translator"
+
 	"github.com/gorhill/cronexpr"
 	"github.com/spf13/cobra"
 )
@@ -12,7 +13,7 @@ import (
 var (
 	nextCmd = &cobra.Command{
 		Use:   "next",
-		Short: "Shows the next occurence of a cron expression",
+		Short: "Shows the next occurrence of a cron expression",
 		Run:   occur,
 	}
 	occurenceNumber = 1
@@ -20,7 +21,7 @@ var (
 )
 
 func init() {
-	nextCmd.Flags().StringVarP(&translator.CronExprsn, "cron", "c", "", "The cron expression to scan for occurence")
+	nextCmd.Flags().StringVarP(&translator.CronExprsn, "cron", "c", "", "The cron expression to scan for occurrence")
 	nextCmd.Flags().IntVarP(&occurenceNumber, "occurence", "o", 1, "The number of occurence time")
 
 }

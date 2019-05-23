@@ -3,7 +3,6 @@ package translator
 import (
 	"crontalk/helper"
 	"net/url"
-	"strconv"
 	"strings"
 )
 
@@ -13,12 +12,15 @@ const (
 	dayIndex    = 2
 	monthIndex  = 3
 	weekIndex   = 4
-	week        = "week"
-	month       = "month"
-	day         = "day"
-	hour        = "hour"
-	minute      = "minute"
+	week        = "Week"
+	month       = "Month"
+	day         = "Day"
+	hour        = "Hour"
+	minute      = "Minute"
 	anyValue    = "*"
+	rangee      = "-"
+	step        = "/"
+	list        = ","
 )
 
 var (
@@ -49,32 +51,21 @@ func Validate() url.Values {
 	// checking the values provided for the expression
 	for i := minuteIndex; i <= weekIndex; i++ {
 		if cronSlice[i] != anyValue {
-			if !helper.IsDigit(cronSlice[i]) { //the value provided must be a digit
-				errs.Add(moments[i]+" value", "The value must a numeric digit or *")
-			} else { //checking the validity of the values in the context of each sub-expressions
-				v, _ := strconv.Atoi(cronSlice[i])
-				if moments[i] == minute {
-					if v < 0 || v > 59 {
-						errs.Add(minute+" value", "The value must be between 0 to 59")
-					}
-				} else if moments[i] == hour {
-					if v < 0 || v > 23 {
-						errs.Add(hour+" value", "The value must be between 0 to 23")
-					}
-				} else if moments[i] == day {
-					if v < 1 || v > 31 {
-						errs.Add(day+" value", "The value must be between 1 to 31")
-					}
-				} else if moments[i] == month {
-					if v < 1 || v > 12 {
-						errs.Add(month+" value", "The value must be between 1 to 12")
-					}
-				} else if moments[i] == week {
-					if v < 0 || v > 6 {
-						errs.Add(week+" value", "The Value must be between 0 to 6")
-					}
+			cc, _ := helper.GetList(cronSlice[i], list)
+			for _, c := range cc { //iterating because values can be listed
+				if strings.Contains(c, step) { // if the expression is a stepped value
+					validateSteppedSubExpression(&errs, c, moments[i]) // validate just the step value
 				}
+				slashIndex := helper.IndexOf(strings.Split(c, ""), step)
+				if slashIndex != -1 { // just validate everything apart from the step values
+					c = c[:slashIndex]
+				}
+				if c != anyValue {
+					validateSubExpressions(&errs, moments[i], c)
+				}
+
 			}
+
 		}
 	}
 	return errs
@@ -100,5 +91,7 @@ func Translate() error {
 
 // GetTranslatedStr returns the translated string
 func GetTranslatedStr() string {
-	return translatedString
+	ts := translatedString
+	translatedString = ""
+	return ts
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"crontalk/config"
 	"crontalk/helper"
 	"log"
 
@@ -17,21 +18,28 @@ CronTalk: Talk to the cron expressions!!
 ------------------------------------------
 
 Translate your cron expressions into very understandable english words.
-Scan the expression for future occurences.
+Scan the expression for future occurrences.
 
 Valid Cron Expressions:
 -----------------------
   "* * * * *" = "(minute) (hour) (day of month) (month) (day of week)"
 1.Should contain exactly 5 values/sub-expressions
-2.Values ar only limited to numeric digits for now
-
+2. Valid values are:
+		minute: 0-59
+		hour:   0-23
+		day of month: 1-31
+		month: 1-12 or jan-dec
+		day of week: 0-6 or sun-sat
 		`,
 	}
 )
 
 func init() {
+	config.LoadConfig()
 	RootCmd.AddCommand(translateCmd)
 	RootCmd.AddCommand(nextCmd)
+	RootCmd.AddCommand(serveCmd)
+	RootCmd.AddCommand(versionCmd)
 }
 
 // Execute the root command
