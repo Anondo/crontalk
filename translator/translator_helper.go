@@ -2,6 +2,7 @@ package translator
 
 import (
 	"crontalk/helper"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -28,8 +29,8 @@ func (t *translator) translateWeekMonth() (bool, error) {
 		return false, nil
 	}
 	if t.stepped {
-		t.translateStepValues()
-		return true, nil
+		return true, t.translateStepValues()
+
 	}
 
 	if t.ranged {
@@ -207,22 +208,32 @@ func (t *translator) translateMinuteOrHour() {
 
 }
 
-func (t *translator) translateStepValues() {
+func (t *translator) translateStepValues() error {
 	steppedCron, _ := helper.GetList(t.cron, step)
 	stepValue := steppedCron[1]
 	value := steppedCron[0]
 	rValue, ranged := helper.GetList(value, rangee)
 
+	if !ranged && !validWordParse(&value, t.moment) {
+		return errors.New("invalid value word")
+	}
+
 	translatedString += " " //adding a space for optical optimization
 
 	if ranged { //if ranged, instead of a default stopping range like normal(i.e 2/2) ones, the ranged value will be given
 		if t.moment == week {
+			if !validWordParse(&rValue[0], week) || !validWordParse(&rValue[1], week) {
+				return errors.New("Invalid ranged step value word")
+			}
 			i1, _ := strconv.Atoi(rValue[0])
 			i2, _ := strconv.Atoi(rValue[1])
 			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
 				viper.GetString(configStr+"from") + weeks[i1] + viper.GetString(configStr+"to") + weeks[i2]
 		}
 		if t.moment == month {
+			if !validWordParse(&rValue[0], month) || !validWordParse(&rValue[1], month) {
+				return errors.New("Invalid ranged step value word")
+			}
 			i1, _ := strconv.Atoi(rValue[0])
 			i2, _ := strconv.Atoi(rValue[1])
 			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
@@ -291,5 +302,7 @@ func (t *translator) translateStepValues() {
 	if t.moment != minute && t.moment != hour {
 		translatedString += " , "
 	}
+
+	return nil
 
 }

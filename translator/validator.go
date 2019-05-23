@@ -33,18 +33,25 @@ var (
 	}
 )
 
-func validWordParse(s *string, moment string) {
-	*s = strings.ToLower(*s)
-	if moment == week {
-		if v, exist := validWeekValueWords[*s]; exist {
-			*s = v
+func validWordParse(s *string, moment string) bool {
+	if !helper.IsDigit(*s) {
+		*s = strings.ToLower(*s)
+		if moment == week {
+			if v, exist := validWeekValueWords[*s]; exist {
+				*s = v
+			} else {
+				return false
+			}
+		}
+		if moment == month {
+			if v, exist := validMonthValueWords[*s]; exist {
+				*s = v
+			} else {
+				return false
+			}
 		}
 	}
-	if moment == month {
-		if v, exist := validMonthValueWords[*s]; exist {
-			*s = v
-		}
-	}
+	return true
 }
 
 func validateSubExpressions(errs *url.Values, moment, c string) {
@@ -142,7 +149,7 @@ func validateSteppedSubExpression(errs *url.Values, se, moment string) {
 	val, err := strconv.Atoi(stepValue)
 
 	if err != nil {
-		errs.Add("Invalid Value", err.Error())
+		errs.Add("Invalid "+moment+" Value", "Invalid step value:"+stepValue)
 	}
 
 	if moment == day {
