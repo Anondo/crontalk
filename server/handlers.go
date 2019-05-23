@@ -10,7 +10,8 @@ import (
 	"log"
 	"net/http"
 
-	translator "crontalk/translator.go"
+	translator "crontalk/translator"
+
 	"github.com/spf13/viper"
 )
 

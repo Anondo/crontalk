@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	translator "crontalk/translator.go"
+	translator "crontalk/translator"
+
 	"github.com/gorhill/cronexpr"
 	"github.com/spf13/cobra"
 )

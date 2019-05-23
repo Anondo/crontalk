@@ -6,7 +6,8 @@ import (
 
 	"crontalk/helper"
 
-	"crontalk/translator.go"
+	"crontalk/translator"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
