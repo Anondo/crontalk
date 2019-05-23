@@ -4,9 +4,8 @@
 
 1. Make the change
 
-1. Open your pull request against dev branch
+1. Open your pull request against the dev branch
 
-1. Update the README.md with details of changes to the interface and a new feature
+1. Update the README.md with details of the changes (if needed)
 
-1. Update the version number in the ```config.yml``` file & hit ```./bind``` and the README.md to the new version that this
-   Pull Request would represent.
+1. Update the version number in the ```config.yml``` file & hit ```./bind``` and also update the  README.md to the new version that this Pull Request would represent.
