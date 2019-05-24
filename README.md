@@ -10,7 +10,16 @@ So try this out.
 
 1. [Download the binary](https://github.com/Anondo/crontalk-bin) for your OS
 
-1. **For Mac/Linux**, add the binary to your $PATH variable or copy it in /usr/bin  to access this from everywhere in the terminal.
+| OS      	| x86                                                                                      	| x86_64                                                                                      	|
+|---------	|------------------------------------------------------------------------------------------	|---------------------------------------------------------------------------------------------	|
+| Mac     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/mac_386.zip)     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/mac_amd64.zip)     	|
+| Linux   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/linux_386.zip)   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/linux_amd64.zip)   	|
+| FreeBSD 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/freebsd_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/freebsd_amd64.zip) 	|
+| Windows 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/windows_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/windows_amd64.zip) 	|
+
+
+
+2. **For Mac/Linux**, add the binary to your $PATH variable or copy it in /usr/bin  to access this from everywhere in the terminal.
 
    **For Windows**  , set the environmental variable to the path of the binary for accessing the app from the terminal
 
