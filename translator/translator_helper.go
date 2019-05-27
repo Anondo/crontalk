@@ -214,7 +214,7 @@ func (t *translator) translateStepValues() error {
 	value := steppedCron[0]
 	rValue, ranged := helper.GetList(value, rangee)
 
-	if !ranged && !validWordParse(&value, t.moment) {
+	if !ranged && value != anyValue && !validWordParse(&value, t.moment) {
 		return errors.New("invalid value word")
 	}
 
