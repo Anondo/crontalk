@@ -40,6 +40,7 @@ func init() {
 	RootCmd.AddCommand(nextCmd)
 	RootCmd.AddCommand(serveCmd)
 	RootCmd.AddCommand(versionCmd)
+	RootCmd.AddCommand(generateCmd)
 }
 
 // Execute the root command
