@@ -9,22 +9,22 @@ import (
 )
 
 const (
-	every       = "every"
-	input       = "<input>"
-	defaultStep = "every <input> minutes"
-	step        = "every <input> minutes from <input> to 59"
-	ranged      = "<input> to <input> minutes"
-	rangedStep  = "every <input> minutes from <input> to <input>"
+	everyMin       = "every"
+	inputMin       = "<input>"
+	defaultStepMin = "every <input> minutes"
+	stepMin        = "every <input> minutes from <input> to 59"
+	rangedMin      = "<input> to <input> minutes"
+	rangedstepMin  = "every <input> minutes from <input> to <input>"
 )
 
 var (
 	minItems = []string{
-		every,
-		input,
-		defaultStep,
-		step,
-		ranged,
-		rangedStep,
+		everyMin,
+		inputMin,
+		defaultStepMin,
+		stepMin,
+		rangedMin,
+		rangedstepMin,
 		done,
 	}
 )
@@ -54,10 +54,10 @@ func runMinute() error {
 }
 
 func parseMinuteExpression(itm string) error {
-	if itm == every {
+	if itm == everyMin {
 		cronSlice[minIndex] += "*"
 	}
-	if itm == input {
+	if itm == inputMin {
 		var min int
 		fmt.Scanf("%d\n", &min)
 		if min < 0 || min > 59 {
@@ -65,7 +65,7 @@ func parseMinuteExpression(itm string) error {
 		}
 		cronSlice[minIndex] += strconv.Itoa(min)
 	}
-	if itm == defaultStep {
+	if itm == defaultStepMin {
 		var stepVal int
 		fmt.Scanf("%d\n", &stepVal)
 		if stepVal < 1 || stepVal > 59 {
@@ -73,7 +73,7 @@ func parseMinuteExpression(itm string) error {
 		}
 		cronSlice[minIndex] += fmt.Sprintf("*/%d", stepVal)
 	}
-	if itm == step {
+	if itm == stepMin {
 		var val, stepVal int
 		fmt.Scanf("%d\n", &stepVal)
 		fmt.Scanf("%d\n", &val)
@@ -85,7 +85,7 @@ func parseMinuteExpression(itm string) error {
 		}
 		cronSlice[minIndex] += fmt.Sprintf("%d/%d", val, stepVal)
 	}
-	if itm == ranged {
+	if itm == rangedMin {
 		var from, to int
 		fmt.Scanf("%d\n", &from)
 		fmt.Scanf("%d\n", &to)
@@ -98,7 +98,7 @@ func parseMinuteExpression(itm string) error {
 		cronSlice[minIndex] += fmt.Sprintf("%d-%d", from, to)
 	}
 
-	if itm == rangedStep {
+	if itm == rangedstepMin {
 		var stepVal, from, to int
 		fmt.Scanf("%d\n", &stepVal)
 		fmt.Scanf("%d\n", &from)
