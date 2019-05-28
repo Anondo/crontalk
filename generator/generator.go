@@ -1,25 +1,26 @@
 package generator
 
-import (
-	"github.com/manifoldco/promptui"
+import "strings"
+
+const (
+	minIndex   = 0
+	hourIndex  = 1
+	dayIndex   = 2
+	monthIndex = 3
+	weekIndex  = 4
+	done       = "done"
+)
+
+var (
+	cronSlice = []string{"*", "*", "*", "*", "*"}
 )
 
 // GenerateCron generates a cron expression by prompting english word options
 func GenerateCron() (string, error) {
-	cronExpression := ""
 
-	prompt := promptui.Select{
-		Label: "Minute",
-		Items: []string{"every"},
-	}
-
-	_, min, err := prompt.Run()
-	if err != nil {
+	if err := runMinute(); err != nil {
 		return "", err
 	}
-
-	if min == "every" {
-		cronExpression += "*"
-	}
+	cronExpression := strings.Join(cronSlice, " ")
 	return cronExpression, nil
 }
