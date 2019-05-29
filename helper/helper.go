@@ -109,40 +109,35 @@ func ChangeDigitLanguage(str *string, lang string) {
 
 // AddOrdinals add ordinal indicators  like 1 -> 1st 2 -> 2nd and so on
 func AddOrdinals(s string) string {
-	theNumber := ""
-	ss := strings.Split(s, "")
-	for i := 0; i < len(ss)-1; i++ { // cant go to the last element because s[i+1] will produce runtime error
-		c := ss[i]
-		nextC := ss[i+1]
-		if IsDigit(c) {
-			theNumber += c
-			if IsDigit(nextC) {
-				continue
-			} else if nextC == " " {
-				newC := addOrdinalIndicator(c)
-				ss[i] = newC
-				theNumber = ""
-			} else {
-				theNumber = ""
-			}
+	ss := strings.Split(s, " ")
+	for _, str := range ss {
+		if IsDigit(str) {
+			s = strings.ReplaceAll(s, str, addOrdinalIndicator(str))
 		}
-
 	}
-	return strings.Join(ss, "")
+	return s
 }
 
 func addOrdinalIndicator(s string) string {
-	switch s {
-	case "1":
-		s += "st"
-	case "2":
-		s += "nd"
-	case "3":
-		s += "rd"
-	default:
-		s += "th"
+	num, _ := strconv.Atoi(s)
+	if num <= 0 {
+		return s //technically ordinals don't exist for <= 0
 	}
-	return s
+
+	if (num%100) >= 11 && (num%100) <= 13 {
+		return s + "th"
+	}
+
+	switch num % 10 {
+	case 1:
+		return s + "st"
+	case 2:
+		return s + "nd"
+	case 3:
+		return s + "rd"
+	default:
+		return s + "th"
+	}
 }
 
 // IndexOf returns the index of the first occurence of the element matched in the string slice
