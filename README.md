@@ -43,6 +43,8 @@ If you can see the version of the app then you are good to go!.
 
 ### Usage
 
+#### Translate
+
 Translate any cron expressions like this,
 ```
 $ crontalk translate --cron="6 12 * * *"
@@ -57,6 +59,32 @@ $ crontalk translate --cron="6 12 * * *" --bangla
 
 ```
 And you will get something like ```প্রতিদিন সময় ১২:০৬PM```
+
+#### Generate
+
+Generate a cron expression from english words. For now the valid & proper english words are prompted by the app for the user to provide input. The ```generate``` command works like this,
+```
+$ crontalk generate
+```
+
+And you will be prompted with the english words required for all the sub-expression for a cron expression(minute,hour/day of month, month,  day of week) one by one like this,
+
+```
+Use the arrow keys to navigate: ↓ ↑ → ←
+? Minute:
+  ▸ done
+    every minute
+    <input>
+    every <input> minutes
+↓   every <input> minutes from <input> to 59
+```
+Until the ```done``` option is selected the particular sub-expression keeps on taking input. This is done because cron sub-expressions can often be listed. Selecting the ```<input>``` for example will block the app for a user input. After providing the input the user will be prompted for the next sub-expression like ```Hour``` and so on upto ```Week```. And finally the result will be something like this,
+
+```
+The cron expression: 30 12 * 6 *
+Translation: Every June At 12:30PM
+
+```
 
 #### Other Available Commands
 

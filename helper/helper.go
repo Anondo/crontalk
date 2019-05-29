@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/viper"
 )
 
@@ -147,6 +148,21 @@ func IndexOf(ss []string, e string) int {
 		}
 	}
 	return -1
+}
+
+// RunPrompt executes a prompt to chose an item from the cli
+func RunPrompt(label string, items []string) (string, error) {
+	prompt := promptui.Select{
+		Label: label,
+		Items: items,
+	}
+
+	_, res, err := prompt.Run()
+	if err != nil {
+		return "", err
+	}
+
+	return res, err
 }
 
 // Unique takes a string slice a removes the duplicate elements
