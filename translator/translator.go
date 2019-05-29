@@ -55,7 +55,7 @@ func Init() {
 func translateBaseOccurence() error {
 	var i int
 	for i = weekIndex; i > hourIndex; i-- { //start iterating from the last sub-expressions to determine the starting string
-		if cronSlice[i] != anyValue {
+		if cronSlice[i] != every {
 			cc, listed := helper.GetList(cronSlice[i], list)
 			for j, c := range cc { //iterating because values can be listed
 				validWordParse(&c, moments[i])
@@ -97,7 +97,7 @@ func translateBaseOccurence() error {
 func translateAllButBaseTimeOccurence() error {
 
 	for i := dayIndex; i <= weekIndex; i++ { //checking every other sub-expressions apart from the base and time, no need for reverse travel
-		if cronSlice[i] != anyValue && i != baseIndex { //not gonna check the base
+		if cronSlice[i] != every && i != baseIndex { //not gonna check the base
 			cc, listed := helper.GetList(cronSlice[i], list)
 			for j, c := range cc { //iterating the single sub-expressions
 				validWordParse(&c, moments[i])
@@ -130,9 +130,9 @@ func translateAllButBaseTimeOccurence() error {
 
 func translateTimeOccurence() error {
 	var t translator
-	if cronSlice[minuteIndex] == anyValue && cronSlice[hourIndex] == anyValue { // checking if both hour and minute are defaults
+	if cronSlice[minuteIndex] == every && cronSlice[hourIndex] == every { // checking if both hour and minute are defaults
 		translatedString += viper.GetString(configStr + "at_every_minute")
-	} else if cronSlice[minuteIndex] != anyValue && cronSlice[hourIndex] != anyValue { //checking if non of them are
+	} else if cronSlice[minuteIndex] != every && cronSlice[hourIndex] != every { //checking if non of them are
 		if err := t.translateMinuteAndHour(); err != nil {
 			return err
 		}
