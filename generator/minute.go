@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	everyMin       = "every"
+	everyMin       = "every minute"
 	inputMin       = "<input>"
 	defaultStepMin = "every <input> minutes"
 	stepMin        = "every <input> minutes from <input> to 59"
@@ -19,13 +19,13 @@ const (
 
 var (
 	minItems = []string{
+		done,
 		everyMin,
 		inputMin,
 		defaultStepMin,
 		stepMin,
 		rangedMin,
 		rangedstepMin,
-		done,
 	}
 )
 

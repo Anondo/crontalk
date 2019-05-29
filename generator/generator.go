@@ -24,6 +24,9 @@ func GenerateCron() (string, error) {
 	if err := runHour(); err != nil {
 		return "", err
 	}
+	if err := runDay(); err != nil {
+		return "", err
+	}
 	cronExpression := strings.Join(cronSlice, " ")
 	return cronExpression, nil
 }

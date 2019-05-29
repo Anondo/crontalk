@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	everyHr       = "every"
+	everyHr       = "every hour"
 	inputHr       = "<input>"
 	defaultStepHr = "every <input> hours"
 	stepHr        = "every <input> hours from <input> to 59"
@@ -19,13 +19,13 @@ const (
 
 var (
 	hourItems = []string{
+		done,
 		everyHr,
 		inputHr,
 		defaultStepHr,
 		stepHr,
 		rangedHr,
 		rangedstepHr,
-		done,
 	}
 )
 
@@ -34,11 +34,11 @@ func runHour() error {
 	var itm string
 	var err error
 	for itm != done { // iterating until the done option is selected because of list values
-		itm, err = helper.RunPrompt("hour", hourItems)
+		itm, err = helper.RunPrompt("Hour", hourItems)
 		if err != nil {
 			return err
 		}
-		if err := parsehourExpression(itm); err != nil {
+		if err := parseHourExpression(itm); err != nil {
 			fmt.Println(err.Error())
 			continue // to avoid adding unwanted ","
 		}
@@ -53,7 +53,7 @@ func runHour() error {
 	return nil
 }
 
-func parsehourExpression(itm string) error {
+func parseHourExpression(itm string) error {
 	if itm == everyHr {
 		cronSlice[hourIndex] += "*"
 	}
@@ -69,7 +69,7 @@ func parsehourExpression(itm string) error {
 		var stepVal int
 		fmt.Scanf("%d\n", &stepVal)
 		if stepVal < 1 || stepVal > 59 {
-			return errors.New("hour: the step value cannot be a negative or 0 number or greater than 59")
+			return errors.New("hour: the step value cannot be less than 1 or greater than 59")
 		}
 		cronSlice[hourIndex] += fmt.Sprintf("*/%d", stepVal)
 	}
@@ -78,7 +78,7 @@ func parsehourExpression(itm string) error {
 		fmt.Scanf("%d\n", &stepVal)
 		fmt.Scanf("%d\n", &val)
 		if stepVal < 1 || stepVal > 59 {
-			return errors.New("hour: the step value cannot be a negative or 0 number or greater than 59")
+			return errors.New("hour: the step value cannot be less then 1 or greater than 59")
 		}
 		if val < 0 || val > 59 {
 			return errors.New("hour: the hour cannot be a negative number & cannot be greater than 59")
@@ -104,10 +104,10 @@ func parsehourExpression(itm string) error {
 		fmt.Scanf("%d\n", &from)
 		fmt.Scanf("%d\n", &to)
 		if stepVal < 1 || stepVal > 59 {
-			return errors.New("hour: the step value cannot be a negative or 0 number or greater than 59")
+			return errors.New("hour: the step value cannot be less then 1 or greater than 59")
 		}
 		if from < 0 || to < 0 || from > to {
-			return errors.New("the hours cannot be negative numbers & the from hour must be greater than the to hour")
+			return errors.New("hour: the hours cannot be negative numbers & the from hour must be greater than the to hour")
 		}
 		if from > 59 || to > 59 {
 			return errors.New("hour: the values cannot be greater than 59")
