@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	cronSlice = []string{"*", "*", "*", "*", "*"}
+	cronSlice = []string{"", "", "", "", ""} //empty strings to append the cron values because values can be listed
 )
 
 // GenerateCron generates a cron expression by prompting english word options
@@ -28,6 +28,9 @@ func GenerateCron() (string, error) {
 		return "", err
 	}
 	if err := runMonth(); err != nil {
+		return "", err
+	}
+	if err := runWeek(); err != nil {
 		return "", err
 	}
 	cronExpression := strings.Join(cronSlice, " ")

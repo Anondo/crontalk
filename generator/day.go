@@ -30,7 +30,6 @@ var (
 )
 
 func runDay() error {
-	cronSlice[dayIndex] = "" // clearing the default * so that all the new values can be appended
 	var itm string
 	var err error
 	for itm != done { // iterating until the done option is selected because of list values
