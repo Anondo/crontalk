@@ -121,20 +121,9 @@ func (t *translator) translateMinuteAndHour() error {
 				t.translateStepValues()
 				steppedHour = true
 			}
-			mrr, rangedM := helper.GetList(min, rangee)
-			hrr, rangedH := helper.GetList(hr, rangee)
-			if rangedM { //if the minute is ranged
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+
-					viper.GetString(configStr+"minute")+mrr[0]+viper.GetString(configStr+"to")+mrr[1], i == 0 && j == 0)
-				translatedString += helper.GetStrIfTrue(mrr[0]+viper.GetString(configStr+"to")+
-					mrr[1], i > 0 || j > 0)
-			}
-			if rangedH { // if the hour is ranged
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hrr[0]+viper.GetString(configStr+"to")+
-					hrr[1], i == 0 && j == 0)
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hrr[0]+viper.GetString(configStr+"to")+
-					hrr[1], i > 0 || j > 0)
-			}
+			_, rangedM := helper.GetList(min, rangee)
+			_, rangedH := helper.GetList(hr, rangee)
+
 			if !rangedM && !rangedH && !steppedHour && !steppedMinute { // if none of them are ranged or stepped then print like a normal time
 				pt, err := helper.PrettyTime(hr, min)
 				if err != nil {
