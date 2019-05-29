@@ -110,12 +110,12 @@ func ChangeDigitLanguage(str *string, lang string) {
 // AddOrdinals add ordinal indicators  like 1 -> 1st 2 -> 2nd and so on
 func AddOrdinals(s string) string {
 	ss := strings.Split(s, " ")
-	for _, str := range ss {
+	for i, str := range ss {
 		if IsDigit(str) {
-			s = strings.ReplaceAll(s, str, addOrdinalIndicator(str))
+			ss[i] = addOrdinalIndicator(str)
 		}
 	}
-	return s
+	return strings.Join(ss, " ")
 }
 
 func addOrdinalIndicator(s string) string {
@@ -163,4 +163,17 @@ func RunPrompt(label string, items []string) (string, error) {
 	}
 
 	return res, err
+}
+
+// Unique takes a string slice a removes the duplicate elements
+func Unique(ss []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, s := range ss {
+		if _, value := keys[s]; !value {
+			keys[s] = true
+			list = append(list, s)
+		}
+	}
+	return list
 }
