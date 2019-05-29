@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"crontalk/generator"
+	translator "crontalk/translator"
 	"fmt"
 	"log"
 
@@ -21,5 +22,8 @@ func generate(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Println(expr)
+	fmt.Println("The cron expression:", expr)
+	fmt.Print("Translation: ")
+	translator.CronExprsn = expr
+	translate(cmd, []string{})
 }
