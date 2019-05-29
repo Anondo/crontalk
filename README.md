@@ -12,10 +12,10 @@ So try this out.
 
 | OS      	| x86                                                                                      	| x86_64                                                                                      	|
 |---------	|------------------------------------------------------------------------------------------	|---------------------------------------------------------------------------------------------	|
-| Mac     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/mac_386.zip)     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/mac_amd64.zip)     	|
-| Linux   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/linux_386.zip)   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/linux_amd64.zip)   	|
-| FreeBSD 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/freebsd_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/freebsd_amd64.zip) 	|
-| Windows 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/windows_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v1/windows_amd64.zip) 	|
+| Mac     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/mac_386.zip)     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/mac_amd64.zip)     	|
+| Linux   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/linux_386.zip)   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/linux_amd64.zip)   	|
+| FreeBSD 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/freebsd_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/freebsd_amd64.zip) 	|
+| Windows 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/windows_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/windows_amd64.zip) 	|
 
 
 
