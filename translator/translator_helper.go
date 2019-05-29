@@ -158,7 +158,7 @@ func (t *translator) translateMinuteAndHour() error {
 func (t *translator) translateMinuteOrHour() {
 	mStr := moments[minuteIndex] // assuming minute is not default
 	mVal := cronSlice[minuteIndex]
-	if mVal == anyValue { //if default
+	if mVal == every { //if default
 		hVal := cronSlice[hourIndex] // working with the hour only
 		hh, listed := helper.GetList(hVal, list)
 		for i, hr := range hh { // iterating because could be a list
@@ -214,7 +214,7 @@ func (t *translator) translateStepValues() error {
 	value := steppedCron[0]
 	rValue, ranged := helper.GetList(value, rangee)
 
-	if !ranged && value != anyValue && !validWordParse(&value, t.moment) {
+	if !ranged && value != every && !validWordParse(&value, t.moment) {
 		return errors.New("invalid value word")
 	}
 
@@ -252,7 +252,7 @@ func (t *translator) translateStepValues() error {
 				viper.GetString(configStr+"from") + rValue[0] + viper.GetString(configStr+"to") + rValue[1]
 		}
 	} else { //if not ranged
-		if value == anyValue { //if */<step-value>
+		if value == every { //if */<step-value>
 			if t.moment == week {
 				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
 					" "
