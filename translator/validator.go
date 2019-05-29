@@ -66,9 +66,9 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 	}
 
 	if !helper.IsDigit(c) && !ranged { //the value provided must be a digit
-		errs.Add(moment+" value", "The value must a positive numeric digit or *")
+		errs.Add(moment+" value", "The value must a positive numeric digit or * or any valid words")
 	} else if ranged && (!helper.IsDigit(vv[0]) || !helper.IsDigit(vv[1])) {
-		errs.Add(moment+" value", "The value must a positive numeric digit or *")
+		errs.Add(moment+" value", "The value must a positive numeric digit or * or any valid words")
 	} else { //checking the validity of the values in the context of each sub-expressions
 		var v, vr1, vr2 int
 		if ranged {
@@ -83,7 +83,7 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 				errs.Add(minute+" value", "The value must be between 0 to 59")
 			}
 			if ranged {
-				if (vr1 < 0 || vr1 > 59) && (vr2 < 0 || vr2 > 59) {
+				if (vr1 < 0 || vr1 > 59) || (vr2 < 0 || vr2 > 59) {
 					errs.Add(minute+" value", "The value must be between 0 to 59")
 				}
 				if vr1 >= vr2 {
@@ -95,7 +95,7 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 				errs.Add(hour+" value", "The value must be between 0 to 23")
 			}
 			if ranged {
-				if (vr1 < 0 || vr1 > 23) && (vr2 < 0 || vr2 > 23) {
+				if (vr1 < 0 || vr1 > 23) || (vr2 < 0 || vr2 > 23) {
 					errs.Add(hour+" value", "The value must be between 0 to 23")
 				}
 				if vr1 >= vr2 {
@@ -107,7 +107,7 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 				errs.Add(day+" value", "The value must be between 1 to 31")
 			}
 			if ranged {
-				if (vr1 < 1 || vr1 > 31) && (vr2 < 1 || vr2 > 31) {
+				if (vr1 < 1 || vr1 > 31) || (vr2 < 1 || vr2 > 31) {
 					errs.Add(day+" value", "The value must be between 1 to 31")
 				}
 				if vr1 >= vr2 {
@@ -119,7 +119,7 @@ func validateSubExpressions(errs *url.Values, moment, c string) {
 				errs.Add(month+" value", "The value must be between 1 to 12 or jan-dec")
 			}
 			if ranged {
-				if (vr1 < 1 || vr1 > 12) && (vr2 < 1 || vr2 > 12) {
+				if (vr1 < 1 || vr1 > 12) || (vr2 < 1 || vr2 > 12) {
 					errs.Add(month+" value", "The value must be between 1 to 12 or jan-dec")
 				}
 				if vr1 >= vr2 {
