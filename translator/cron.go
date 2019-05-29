@@ -42,6 +42,11 @@ func Validate() url.Values {
 	CronExprsn = helper.TrimExtraSpaces(CronExprsn)
 	cronSlice = strings.Split(CronExprsn, " ")
 
+	for i, cron := range cronSlice { // removing duplicate cron expression values
+		cc, _ := helper.GetList(cron, list)
+		cronSlice[i] = strings.Join(helper.Unique(cc), ",")
+	}
+
 	errs := url.Values{}
 	// checking the length of the expression
 	if len(cronSlice) != 5 {

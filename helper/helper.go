@@ -148,3 +148,16 @@ func IndexOf(ss []string, e string) int {
 	}
 	return -1
 }
+
+// Unique takes a string slice a removes the duplicate elements
+func Unique(ss []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, s := range ss {
+		if _, value := keys[s]; !value {
+			keys[s] = true
+			list = append(list, s)
+		}
+	}
+	return list
+}
