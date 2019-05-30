@@ -7,32 +7,39 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/spf13/viper"
 )
 
 // StartServer starts the http server
 func StartServer() {
-
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGKILL, syscall.SIGINT, syscall.SIGQUIT)
 
 	port := viper.GetInt("port")
-	http.HandleFunc("/crontalk/translate", translateHandler)
-	http.HandleFunc("/", templateHandler)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/crontalk/translate", translateHandler)
+	mux.HandleFunc("/", templateHandler)
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+
 	go func() {
-		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
-			log.Fatal("Failed to start crontalk server: ", err.Error())
+		sig := <-stop
+
+		log.Printf("CronTalk server gracefully shutting down (reason: %v)\n", sig)
+
+		err := srv.Close()
+		if err != nil {
+			log.Fatalf("Error shutting down server: %v", err)
 		}
 	}()
 
-	time.Sleep(10 * time.Millisecond)
-
 	fmt.Printf("Crontalk server running at http://localhost:%d\n", port)
-
-	<-stop
-
-	log.Println("CronTalk server gracefully shutdown")
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.Fatalf("Failed to start crontalk server: %v", err)
+	}
 
 }
