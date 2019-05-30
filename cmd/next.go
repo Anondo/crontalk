@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	translator "crontalk/translator"
@@ -16,7 +16,7 @@ var (
 		Use:     "next",
 		Short:   "Shows the next occurrence of a cron expression",
 		Example: `crontalk next "* * * * *"`,
-		Run:     occur,
+		RunE:    occur,
 	}
 	occurenceNumber = 1
 	layout          = "2006-01-02 03:04PM"
@@ -27,22 +27,27 @@ func init() {
 
 }
 
-func occur(cmd *cobra.Command, args []string) {
+func occur(cmd *cobra.Command, args []string) error {
 
 	if len(args) < 1 {
-		log.Fatal("no cron expression detected")
+		return errors.New("no cron expression detected")
 	}
 
 	translator.CronExprsn = args[0]
 
 	if vErr := translator.Validate(); len(vErr) != 0 {
-		for k, v := range vErr {
-			fmt.Printf("%v: %v\n", k, v)
+		for en, ev := range vErr {
+			fmt.Printf("%v:\n", en)
+			for i, e := range ev {
+				fmt.Printf("%d.%v\n", i+1, e)
+			}
 		}
-		return
+		return nil
 	}
 	exprns := cronexpr.MustParse(translator.CronExprsn).NextN(time.Now(), uint(occurenceNumber))
 	for _, expr := range exprns {
 		fmt.Println(expr.Format(layout))
 	}
+
+	return nil
 }
