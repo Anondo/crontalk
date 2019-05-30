@@ -12,10 +12,10 @@ So try this out.
 
 | OS      	| x86                                                                                      	| x86_64                                                                                      	|
 |---------	|------------------------------------------------------------------------------------------	|---------------------------------------------------------------------------------------------	|
-| Mac     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/mac_386.zip)     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/mac_amd64.zip)     	|
-| Linux   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/linux_386.zip)   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/linux_amd64.zip)   	|
-| FreeBSD 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/freebsd_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/freebsd_amd64.zip) 	|
-| Windows 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/windows_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2/windows_amd64.zip) 	|
+| Mac     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/mac_386.zip)     	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/mac_amd64.zip)     	|
+| Linux   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/linux_386.zip)   	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/linux_amd64.zip)   	|
+| FreeBSD 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/freebsd_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/freebsd_amd64.zip) 	|
+| Windows 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/windows_386.zip) 	| [Download](https://github.com/Anondo/crontalk-bin/blob/master/v2.1.0/windows_amd64.zip) 	|
 
 
 
@@ -47,7 +47,7 @@ If you can see the version of the app then you are good to go!.
 
 Translate any cron expressions like this,
 ```
-$ crontalk translate --cron="6 12 * * *"
+$ crontalk translate "6 12 * * *"
 ```
 
 And the result will be ```Every Day At 12:06PM```.
@@ -55,7 +55,7 @@ And the result will be ```Every Day At 12:06PM```.
 Also **CronTalk** supports multiple languages (english & bangla for now with english being the default). So try,
 
 ```
-$ crontalk translate --cron="6 12 * * *" --bangla
+$ crontalk translate "6 12 * * *" --bangla
 
 ```
 And you will get something like ```প্রতিদিন সময় ১২:০৬PM```
@@ -90,7 +90,7 @@ Translation: Every June At 12:30PM
 
 List the next occurrence(s) for a cron expression,
 ```
-$ crontalk next --cron="6 12 * * *" -o 5
+$ crontalk next "6 12 * * *" -o 5
 ```
 
 Doing this will give you
