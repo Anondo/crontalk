@@ -29,6 +29,8 @@ const (
 func TrimExtraSpaces(s string) string {
 	space := regexp.MustCompile(`\s+`)
 	s = space.ReplaceAllString(s, " ")
+	s = strings.TrimPrefix(s, " ")
+	s = strings.TrimSuffix(s, " ")
 	return s
 }
 

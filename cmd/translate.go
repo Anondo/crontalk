@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
-	"crontalk/helper"
+	"github.com/Anondo/crontalk/helper"
 
-	"crontalk/translator"
+	"github.com/Anondo/crontalk/translator"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,8 +15,9 @@ var (
 	translateCmd = &cobra.Command{
 		Use:     "translate",
 		Short:   "Translates the given cron expression to english words",
-		Example: `crontalk translate "* * * * *"`,
 		RunE:    translate,
+		Example: `crontalk translate "* * * * *"`,
+		Args:    cobra.ExactArgs(1),
 	}
 )
 
@@ -27,10 +27,6 @@ func init() {
 }
 
 func translate(cmd *cobra.Command, args []string) error {
-
-	if len(args) < 1 {
-		return errors.New("no cron expression detected")
-	}
 
 	translator.CronExprsn = args[0]
 

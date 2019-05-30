@@ -1,6 +1,6 @@
 package main
 
-import "crontalk/cmd"
+import "github.com/Anondo/crontalk/cmd"
 
 func main() {
 	cmd.Execute()
