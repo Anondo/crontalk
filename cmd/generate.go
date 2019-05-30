@@ -5,7 +5,6 @@ import (
 
 	"github.com/Anondo/crontalk/generator"
 	translator "github.com/Anondo/crontalk/translator"
-	"log"
 
 	"github.com/spf13/cobra"
 )

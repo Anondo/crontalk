@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -17,6 +16,7 @@ var (
 		Short:   "Shows the next occurrence of a cron expression",
 		Example: `crontalk next "* * * * *"`,
 		RunE:    occur,
+		Args:    cobra.ExactArgs(1),
 	}
 	occurenceNumber = 1
 	layout          = "2006-01-02 03:04PM"
@@ -28,10 +28,6 @@ func init() {
 }
 
 func occur(cmd *cobra.Command, args []string) error {
-
-	if len(args) < 1 {
-		return errors.New("no cron expression detected")
-	}
 
 	translator.CronExprsn = args[0]
 

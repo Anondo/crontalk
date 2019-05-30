@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/Anondo/crontalk/helper"
@@ -14,12 +13,11 @@ import (
 
 var (
 	translateCmd = &cobra.Command{
-		Use:   "translate",
-		Short: "Translates the given cron expression to english words",
-		RunE:   translate,
-    Example: `crontalk translate "* * * * *"`,
-		Args:  cobra.ExactArgs(1),
-
+		Use:     "translate",
+		Short:   "Translates the given cron expression to english words",
+		RunE:    translate,
+		Example: `crontalk translate "* * * * *"`,
+		Args:    cobra.ExactArgs(1),
 	}
 )
 
@@ -27,7 +25,6 @@ func init() {
 	translateCmd.Flags().BoolP("bangla", "b", false, "The translation to be in Bangla language")
 	viper.BindPFlag("bangla", translateCmd.Flags().Lookup("bangla"))
 }
-
 
 func translate(cmd *cobra.Command, args []string) error {
 
