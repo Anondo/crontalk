@@ -1,9 +1,11 @@
 package cmd
 
 import (
-	"crontalk/generator"
-	translator "crontalk/translator"
 	"fmt"
+
+	"github.com/Anondo/crontalk/generator"
+	translator "github.com/Anondo/crontalk/translator"
+	"log"
 
 	"github.com/spf13/cobra"
 )

@@ -2,7 +2,7 @@ package config
 
 import (
 	"bytes"
-	"crontalk/binded"
+	"github.com/Anondo/crontalk/binded"
 	"log"
 
 	"github.com/spf13/viper"

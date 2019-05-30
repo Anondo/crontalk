@@ -1,7 +1,7 @@
 package translator
 
 import (
-	"crontalk/helper"
+	"github.com/Anondo/crontalk/helper"
 	"strings"
 
 	"github.com/spf13/viper"
