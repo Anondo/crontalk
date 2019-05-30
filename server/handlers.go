@@ -2,15 +2,15 @@ package server
 
 import (
 	"bytes"
-	"crontalk/binded"
-	"crontalk/helper"
+	"github.com/Anondo/crontalk/binded"
+	"github.com/Anondo/crontalk/helper"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 
-	translator "crontalk/translator"
+	translator "github.com/Anondo/crontalk/translator"
 
 	"github.com/spf13/viper"
 )

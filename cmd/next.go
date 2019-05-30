@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	translator "crontalk/translator"
+	translator "github.com/Anondo/crontalk/translator"
 
 	"github.com/gorhill/cronexpr"
 	"github.com/spf13/cobra"

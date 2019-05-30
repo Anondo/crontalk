@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"crontalk/config"
-	"crontalk/helper"
+	"github.com/Anondo/crontalk/config"
+	"github.com/Anondo/crontalk/helper"
 	"log"
 
 	"github.com/spf13/cobra"

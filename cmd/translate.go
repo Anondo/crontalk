@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"crontalk/helper"
+	"github.com/Anondo/crontalk/helper"
 
-	"crontalk/translator"
+	"github.com/Anondo/crontalk/translator"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

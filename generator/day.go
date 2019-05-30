@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"crontalk/helper"
+	"github.com/Anondo/crontalk/helper"
 	"errors"
 	"fmt"
 	"strconv"
