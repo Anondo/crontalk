@@ -50,7 +50,7 @@ func Validate() url.Values {
 	errs := url.Values{}
 	// checking the length of the expression
 	if len(cronSlice) != 5 {
-		errs.Add("Expression Values", "A cron expression must contain 5 values/sub-expression")
+		errs.Add("Expression Values", "A cron expression must contain 5 values/sub-expressions")
 		return errs
 	}
 	// checking the values provided for the expression

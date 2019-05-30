@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	translator "crontalk/translator"
@@ -12,21 +13,27 @@ import (
 
 var (
 	nextCmd = &cobra.Command{
-		Use:   "next",
-		Short: "Shows the next occurrence of a cron expression",
-		Run:   occur,
+		Use:     "next",
+		Short:   "Shows the next occurrence of a cron expression",
+		Example: `crontalk next "* * * * *"`,
+		Run:     occur,
 	}
 	occurenceNumber = 1
 	layout          = "2006-01-02 03:04PM"
 )
 
 func init() {
-	nextCmd.Flags().StringVarP(&translator.CronExprsn, "cron", "c", "", "The cron expression to scan for occurrence")
 	nextCmd.Flags().IntVarP(&occurenceNumber, "occurence", "o", 1, "The number of occurence time")
 
 }
 
 func occur(cmd *cobra.Command, args []string) {
+
+	if len(args) < 1 {
+		log.Fatal("no cron expression detected")
+	}
+
+	translator.CronExprsn = args[0]
 
 	if vErr := translator.Validate(); len(vErr) != 0 {
 		for k, v := range vErr {

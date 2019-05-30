@@ -14,19 +14,25 @@ import (
 
 var (
 	translateCmd = &cobra.Command{
-		Use:   "translate",
-		Short: "Translates the given cron expression to english words",
-		Run:   translate,
+		Use:     "translate",
+		Short:   "Translates the given cron expression to english words",
+		Example: `crontalk translate "* * * * *"`,
+		Run:     translate,
 	}
 )
 
 func init() {
-	translateCmd.Flags().StringVarP(&translator.CronExprsn, "cron", "c", "", "The cron expression to translate to english words")
 	translateCmd.Flags().BoolP("bangla", "b", false, "The translation to be in Bangla language")
 	viper.BindPFlag("bangla", translateCmd.Flags().Lookup("bangla"))
 }
 
 func translate(cmd *cobra.Command, args []string) {
+
+	if len(args) < 1 {
+		log.Fatal("no cron expression detected")
+	}
+
+	translator.CronExprsn = args[0]
 
 	translator.Init()
 
