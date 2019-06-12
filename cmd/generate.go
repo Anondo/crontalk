@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Anondo/crontalk/generator"
-	translator "github.com/Anondo/crontalk/translator"
 
 	"github.com/spf13/cobra"
 )
@@ -24,8 +23,7 @@ func generate(cmd *cobra.Command, args []string) error {
 	}
 	fmt.Println("The cron expression:", expr)
 	fmt.Print("Translation: ")
-	translator.CronExprsn = expr
-	translate(cmd, []string{})
+	translate(cmd, []string{expr})
 
 	return err
 }
