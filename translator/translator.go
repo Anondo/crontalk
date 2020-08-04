@@ -1,15 +1,11 @@
 package translator
 
 import (
-	"github.com/Anondo/crontalk/helper"
 	"strings"
 
-	"github.com/spf13/viper"
-)
+	"github.com/Anondo/crontalk/helper"
 
-const (
-	english = "english"
-	bangla  = "bangla"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -17,14 +13,11 @@ var (
 	months    = map[int]string{}
 	baseIndex int
 	configStr = ""
-	language  = english
 )
 
 // Init initializes the translator
 func Init() {
-	if viper.GetBool(bangla) {
-		language = bangla
-	}
+	language := viper.GetString("lang")
 	configStr = "language." + language + "." //the config index to parse the config yaml file from viper
 
 	weeks = map[int]string{

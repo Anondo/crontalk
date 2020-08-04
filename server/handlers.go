@@ -12,8 +12,6 @@ import (
 	"github.com/Anondo/crontalk/helper"
 
 	translator "github.com/Anondo/crontalk/translator"
-
-	"github.com/spf13/viper"
 )
 
 func translateHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,9 +52,9 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 	output := translator.GetTranslatedStr()
 	output = helper.TrimExtraSpaces(output)
 
-	if viper.GetBool("bangla") {
-		helper.ChangeDigitLanguage(&output, "bangla") //changing the english digits to bangla
-	}
+	// if viper.GetBool("bangla") {
+	// 	helper.ChangeDigitLanguage(&output, "bangla") //changing the english digits to bangla
+	// }
 
 	output = helper.AddOrdinals(output)
 

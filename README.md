@@ -55,7 +55,7 @@ And the result will be ```Every Day At 12:06PM```.
 Also **CronTalk** supports multiple languages (english & bangla for now with english being the default). So try,
 
 ```
-$ crontalk translate "6 12 * * *" --bangla
+$ crontalk translate "6 12 * * *" --lang=bangla
 
 ```
 And you will get something like ```প্রতিদিন সময় ১২:০৬PM```
