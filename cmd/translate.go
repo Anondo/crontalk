@@ -29,8 +29,6 @@ func init() {
 
 func translate(cmd *cobra.Command, args []string) error {
 
-	translator.CronExprsn = args[0]
-
 	lang := strings.ToLower(viper.GetString("lang"))
 
 	if lang != helper.LanguageEnglish {
@@ -46,7 +44,9 @@ func translate(cmd *cobra.Command, args []string) error {
 
 	translator.Init()
 
-	if vErr := translator.Validate(); len(vErr) != 0 {
+	tr := translator.NewTranslator(args[0])
+
+	if vErr := tr.Validate(); len(vErr) != 0 {
 		for en, ev := range vErr {
 			fmt.Printf("%v:\n", en)
 			for i, e := range ev {
@@ -56,11 +56,11 @@ func translate(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if err := translator.Translate(); err != nil {
+	if err := tr.Translate(); err != nil {
 		return err
 	}
 
-	output := translator.GetTranslatedStr()
+	output := tr.GetTranslatedStr()
 	output = helper.TrimExtraSpaces(output)
 
 	if lang != helper.LanguageEnglish {

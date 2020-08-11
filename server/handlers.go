@@ -29,27 +29,27 @@ func translateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	translator.CronExprsn = req.Exprsn
-
 	translator.Init()
 
-	if vErr := translator.Validate(); len(vErr) != 0 {
+	tr := translator.NewTranslator(req.Exprsn)
+
+	if vErr := tr.Validate(); len(vErr) != 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		for k, v := range vErr {
 			fmt.Fprintf(w, "%v: %v\n", k, v)
 		}
 		log.Printf("%s %d http://%s%s\n", r.Method, http.StatusBadRequest, r.Host, r.URL.Path)
-		translator.GetTranslatedStr()
+		tr.GetTranslatedStr()
 		return
 	}
 
-	if err := translator.Translate(); err != nil {
+	if err := tr.Translate(); err != nil {
 		log.Println(err.Error())
-		translator.GetTranslatedStr()
+		tr.GetTranslatedStr()
 		return
 	}
 
-	output := translator.GetTranslatedStr()
+	output := tr.GetTranslatedStr()
 	output = helper.TrimExtraSpaces(output)
 
 	// if viper.GetBool("bangla") {

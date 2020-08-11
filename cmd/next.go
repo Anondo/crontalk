@@ -29,9 +29,9 @@ func init() {
 
 func occur(cmd *cobra.Command, args []string) error {
 
-	translator.CronExprsn = args[0]
+	tr := translator.NewTranslator(args[0])
 
-	if vErr := translator.Validate(); len(vErr) != 0 {
+	if vErr := tr.Validate(); len(vErr) != 0 {
 		for en, ev := range vErr {
 			fmt.Printf("%v:\n", en)
 			for i, e := range ev {
@@ -40,7 +40,7 @@ func occur(cmd *cobra.Command, args []string) error {
 		}
 		return nil
 	}
-	exprns := cronexpr.MustParse(translator.CronExprsn).NextN(time.Now(), uint(occurenceNumber))
+	exprns := cronexpr.MustParse(tr.CronExpression).NextN(time.Now(), uint(occurenceNumber))
 	for _, expr := range exprns {
 		fmt.Println(expr.Format(layout))
 	}

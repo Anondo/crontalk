@@ -15,6 +15,19 @@ var (
 	configStr = ""
 )
 
+// Translator is the one who is responsible for all the translations
+type Translator struct {
+	CronExpression string
+	translatedStr  string
+}
+
+// NewTranslator generates a new translator with the given cron expression
+func NewTranslator(ce string) *Translator {
+	return &Translator{
+		CronExpression: ce,
+	}
+}
+
 // Init initializes the translator
 func Init() {
 	language := viper.GetString("lang")
@@ -45,7 +58,7 @@ func Init() {
 	}
 }
 
-func translateBaseOccurence() error {
+func (t *Translator) translateBaseOccurence() error {
 	var i int
 	for i = weekIndex; i > hourIndex; i-- { //start iterating from the last sub-expressions to determine the starting string
 		if cronSlice[i] != every {
@@ -57,29 +70,30 @@ func translateBaseOccurence() error {
 					validWordParse(&rr[0], moments[i])
 					validWordParse(&rr[1], moments[i])
 				}
-				t := translator{
-					cron:          c,
-					moment:        moments[i],
-					cronRange:     rr,
-					ranged:        ranged,
-					listed:        listed,
-					stepped:       strings.Contains(c, step),
-					base:          true,
-					cronListedLen: len(cc),
-					index:         j,
+				th := translatorHelper{
+					cron:             c,
+					moment:           moments[i],
+					cronRange:        rr,
+					ranged:           ranged,
+					listed:           listed,
+					stepped:          strings.Contains(c, step),
+					base:             true,
+					cronListedLen:    len(cc),
+					index:            j,
+					translatedString: &t.translatedStr,
 				}
-				if found, err := t.translateWeekMonth(); err != nil {
+				if found, err := th.translateWeekMonth(); err != nil {
 					return err
 				} else if found {
 					continue
 				}
-				t.translateDay()
+				th.translateDay()
 			}
 			break //once the base value is found no need for further iterations
 		}
 	}
 	if i == hourIndex { // checking if every sub-expression contains asteriks apart from the time part
-		translatedString += viper.GetString(configStr + "every_day")
+		t.translatedStr += viper.GetString(configStr + "every_day")
 	}
 	baseIndex = i //storing the base index so that when checking every other than time , the base is also omitted because its
 	//already checked
@@ -87,7 +101,7 @@ func translateBaseOccurence() error {
 
 }
 
-func translateAllButBaseTimeOccurence() error {
+func (t *Translator) translateAllButBaseTimeOccurence() error {
 
 	for i := dayIndex; i <= weekIndex; i++ { //checking every other sub-expressions apart from the base and time, no need for reverse travel
 		if cronSlice[i] != every && i != baseIndex { //not gonna check the base
@@ -99,21 +113,22 @@ func translateAllButBaseTimeOccurence() error {
 					validWordParse(&rr[0], moments[i])
 					validWordParse(&rr[1], moments[i])
 				}
-				t := translator{
-					cron:          c,
-					moment:        moments[i],
-					cronRange:     rr,
-					ranged:        ranged,
-					listed:        listed,
-					stepped:       strings.Contains(c, step),
-					base:          false,
-					cronListedLen: len(cc),
-					index:         j,
+				th := translatorHelper{
+					cron:             c,
+					moment:           moments[i],
+					cronRange:        rr,
+					ranged:           ranged,
+					listed:           listed,
+					stepped:          strings.Contains(c, step),
+					base:             false,
+					cronListedLen:    len(cc),
+					index:            j,
+					translatedString: &t.translatedStr,
 				}
-				if found, err := t.translateWeekMonth(); err != nil {
+				if found, err := th.translateWeekMonth(); err != nil {
 					return err
 				} else if !found {
-					t.translateDay()
+					th.translateDay()
 				}
 			}
 		}
@@ -121,16 +136,18 @@ func translateAllButBaseTimeOccurence() error {
 	return nil
 }
 
-func translateTimeOccurence() error {
-	var t translator
+func (t *Translator) translateTimeOccurence() error {
+	th := translatorHelper{
+		translatedString: &t.translatedStr,
+	}
 	if cronSlice[minuteIndex] == every && cronSlice[hourIndex] == every { // checking if both hour and minute are defaults
-		translatedString += viper.GetString(configStr + "at_every_minute")
+		t.translatedStr += viper.GetString(configStr + "at_every_minute")
 	} else if cronSlice[minuteIndex] != every && cronSlice[hourIndex] != every { //checking if non of them are
-		if err := t.translateMinuteAndHour(); err != nil {
+		if err := th.translateMinuteAndHour(); err != nil {
 			return err
 		}
 	} else { // checking if  just one of them is default
-		t.translateMinuteOrHour()
+		th.translateMinuteOrHour()
 	}
 	return nil
 }

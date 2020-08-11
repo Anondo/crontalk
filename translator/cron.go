@@ -1,9 +1,10 @@
 package translator
 
 import (
-	"github.com/Anondo/crontalk/helper"
 	"net/url"
 	"strings"
+
+	"github.com/Anondo/crontalk/helper"
 )
 
 const (
@@ -24,11 +25,8 @@ const (
 )
 
 var (
-	// CronExprsn is the cron expression
-	CronExprsn       string
-	cronSlice        []string
-	translatedString string
-	moments          = map[int]string{
+	cronSlice []string
+	moments   = map[int]string{
 		minuteIndex: minute,
 		hourIndex:   hour,
 		dayIndex:    day,
@@ -38,9 +36,9 @@ var (
 )
 
 // Validate validates the cron expression provided
-func Validate() url.Values {
-	CronExprsn = helper.TrimExtraSpaces(CronExprsn)
-	cronSlice = strings.Split(CronExprsn, " ")
+func (t *Translator) Validate() url.Values {
+	t.CronExpression = helper.TrimExtraSpaces(t.CronExpression)
+	cronSlice = strings.Split(t.CronExpression, " ")
 
 	for i, cron := range cronSlice { // removing duplicate cron expression values
 		cc, _ := helper.GetList(cron, list)
@@ -77,17 +75,17 @@ func Validate() url.Values {
 }
 
 // Translate does everything to translate a cron expression to english sentence
-func Translate() error {
+func (t *Translator) Translate() error {
 	// translate the base occurence
-	if err := translateBaseOccurence(); err != nil {
+	if err := t.translateBaseOccurence(); err != nil {
 		return err
 	}
 	//translate every other occurence
-	if err := translateAllButBaseTimeOccurence(); err != nil {
+	if err := t.translateAllButBaseTimeOccurence(); err != nil {
 		return err
 	}
 	// translate the time at the very end
-	if err := translateTimeOccurence(); err != nil {
+	if err := t.translateTimeOccurence(); err != nil {
 		return err
 	}
 	return nil
@@ -95,8 +93,6 @@ func Translate() error {
 }
 
 // GetTranslatedStr returns the translated string
-func GetTranslatedStr() string {
-	ts := translatedString
-	translatedString = ""
-	return ts
+func (t *Translator) GetTranslatedStr() string {
+	return t.translatedStr
 }
