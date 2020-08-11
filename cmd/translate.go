@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Anondo/crontalk/helper"
 
@@ -22,13 +23,26 @@ var (
 )
 
 func init() {
-	translateCmd.Flags().BoolP("bangla", "b", false, "The translation to be in Bangla language")
-	viper.BindPFlag("bangla", translateCmd.Flags().Lookup("bangla"))
+	translateCmd.Flags().StringP("lang", "l", "english", "Set the translation language")
+	viper.BindPFlag("lang", translateCmd.Flags().Lookup("lang"))
 }
 
 func translate(cmd *cobra.Command, args []string) error {
 
 	translator.CronExprsn = args[0]
+
+	lang := strings.ToLower(viper.GetString("lang"))
+
+	if lang != helper.LanguageEnglish {
+		langMap := viper.GetStringMap("language")
+		if _, exists := langMap[lang]; !exists {
+			possibleLangs := []string{}
+			for pl := range langMap {
+				possibleLangs = append(possibleLangs, pl)
+			}
+			return fmt.Errorf("%s, valid values: %v", helper.ErrInvalidLangValue, possibleLangs)
+		}
+	}
 
 	translator.Init()
 
@@ -49,8 +63,8 @@ func translate(cmd *cobra.Command, args []string) error {
 	output := translator.GetTranslatedStr()
 	output = helper.TrimExtraSpaces(output)
 
-	if viper.GetBool("bangla") {
-		helper.ChangeDigitLanguage(&output, "bangla") //changing the english digits to bangla
+	if lang != helper.LanguageEnglish {
+		helper.ChangeDigitLanguage(&output, lang) //changing the english digits to different language
 	}
 
 	output = helper.AddOrdinals(output)
