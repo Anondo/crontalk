@@ -3,16 +3,17 @@ package generator
 import (
 	"errors"
 	"fmt"
-	"github.com/Anondo/crontalk/helper"
 	"strconv"
 	"strings"
+
+	"github.com/Anondo/crontalk/helper"
 )
 
 const (
 	everyHr       = "every hour"
 	inputHr       = "<input>"
 	defaultStepHr = "every <input> hours"
-	stepHr        = "every <input> hours from <input> to 59"
+	stepHr        = "every <input> hours from <input> to 23"
 	rangedHr      = "<input> to <input> hours"
 	rangedstepHr  = "every <input> hours from <input> to <input>"
 )
