@@ -104,7 +104,9 @@ func ChangeDigitLanguage(str *string, lang string) {
 		cs := string(c)
 		if IsDigit(cs) {
 			char := viper.GetString(configStr + cs)
-			*str = strings.Replace(*str, cs, char, -1)
+			if char != "" {
+				*str = strings.Replace(*str, cs, char, -1)
+			}
 		}
 	}
 }
