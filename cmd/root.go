@@ -42,6 +42,7 @@ func init() {
 	RootCmd.AddCommand(serveCmd)
 	RootCmd.AddCommand(versionCmd)
 	RootCmd.AddCommand(generateCmd)
+	RootCmd.AddCommand(languagesCmd)
 }
 
 // Execute the root command
