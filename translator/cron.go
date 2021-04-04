@@ -1,9 +1,10 @@
 package translator
 
 import (
-	"github.com/Anondo/crontalk/helper"
 	"net/url"
 	"strings"
+
+	"github.com/Anondo/crontalk/helper"
 )
 
 const (
@@ -12,11 +13,11 @@ const (
 	dayIndex    = 2
 	monthIndex  = 3
 	weekIndex   = 4
-	week        = "Week"
-	month       = "Month"
-	day         = "Day"
-	hour        = "Hour"
-	minute      = "Minute"
+	week        = "week"
+	month       = "month"
+	day         = "day"
+	hour        = "hour"
+	minute      = "minute"
 	every       = "*"
 	rangee      = "-"
 	step        = "/"
@@ -90,6 +91,16 @@ func Translate() error {
 	if err := translateTimeOccurence(); err != nil {
 		return err
 	}
+
+	// translate the digits if not english
+	translateDigits()
+
+	// add ordinals to the translates string
+	translatedString = helper.AddOrdinals(translatedString)
+
+	// removing extra spaces
+	translatedString = helper.TrimExtraSpaces(translatedString)
+
 	return nil
 
 }

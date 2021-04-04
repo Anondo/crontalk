@@ -1,12 +1,11 @@
 package translator
 
 import (
-	"github.com/Anondo/crontalk/helper"
 	"errors"
 	"strconv"
 	"strings"
 
-	"github.com/spf13/viper"
+	"github.com/Anondo/crontalk/helper"
 )
 
 type translator struct {
@@ -49,31 +48,31 @@ func (t *translator) translateWeekMonth() (bool, error) {
 	}
 
 	if t.base {
-		mtext = "every"
+		mtext = cfg.Every
 	}
 	mm := weeks
 	if !t.base {
-		mtext = "on"
+		mtext = cfg.Onn
 	}
 	if t.moment == month {
 		mm = months
 		if !t.base {
-			mtext = "on_month_of"
+			mtext = cfg.OnMonthOf
 		}
 	}
 
 	//the following is for proper & meaningful sentence
 	if t.ranged {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+mm[v1]+
-			viper.GetString(configStr+"to")+mm[v2], t.index == 0) //if this is the first check
-		translatedString += helper.GetStrIfTrue(mm[v1]+viper.GetString(configStr+"to")+mm[v2],
+		translatedString += helper.GetStrIfTrue(mtext+mm[v1]+
+			cfg.To+mm[v2], t.index == 0) //if this is the first check
+		translatedString += helper.GetStrIfTrue(mm[v1]+cfg.To+mm[v2],
 			t.index > 0) //just keep adding the value & not the full sentence
 
 	} else {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+mm[v], t.index == 0) //if this is the first check
-		translatedString += helper.GetStrIfTrue(mm[v], t.index > 0)                                   //just keep adding the value & not the full sentence
+		translatedString += helper.GetStrIfTrue(mtext+mm[v], t.index == 0) //if this is the first check
+		translatedString += helper.GetStrIfTrue(mm[v], t.index > 0)        //just keep adding the value & not the full sentence
 	}
-	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1) //print "and" for listed
+	translatedString += helper.GetStrIfTrue(cfg.And, t.listed && t.index < t.cronListedLen-1) //print "and" for listed
 	return true, nil
 }
 
@@ -83,21 +82,21 @@ func (t *translator) translateDay() {
 		t.translateStepValues()
 		return
 	}
-	mtext := "every" //setting the starting text for translation
+	mtext := cfg.Every //setting the starting text for translation
 	if !t.base {
-		mtext = "onn"
+		mtext = cfg.Onn
 	}
 	if t.ranged {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+viper.GetString(configStr+t.moment)+
-			t.cronRange[0]+viper.GetString(configStr+"to")+t.cronRange[1], t.index == 0)
-		translatedString += helper.GetStrIfTrue(t.cronRange[0]+viper.GetString(configStr+"to")+t.cronRange[1],
+		translatedString += helper.GetStrIfTrue(mtext+cfg.ToMap()[t.moment]+
+			t.cronRange[0]+cfg.To+t.cronRange[1], t.index == 0)
+		translatedString += helper.GetStrIfTrue(t.cronRange[0]+cfg.To+t.cronRange[1],
 			t.index > 0)
 	} else {
-		translatedString += helper.GetStrIfTrue(viper.GetString(configStr+mtext)+viper.GetString(configStr+t.moment)+
+		translatedString += helper.GetStrIfTrue(mtext+cfg.ToMap()[t.moment]+
 			t.cron, t.index == 0)
 		translatedString += helper.GetStrIfTrue(t.cron, t.index > 0)
 	}
-	translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), t.listed && t.index < t.cronListedLen-1)
+	translatedString += helper.GetStrIfTrue(cfg.And, t.listed && t.index < t.cronListedLen-1)
 }
 
 func (t *translator) translateMinuteAndHour() error {
@@ -129,15 +128,15 @@ func (t *translator) translateMinuteAndHour() error {
 				if err != nil {
 					return err
 				}
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+pt, i == 0 && j == 0)
+				translatedString += helper.GetStrIfTrue(cfg.At+pt, i == 0 && j == 0)
 				translatedString += helper.GetStrIfTrue(pt, i > 0 || j > 0)
 			} else if (!rangedH && !steppedHour) && (rangedM || steppedMinute) { //or if only the minute is ranged or stepped
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"hour")+hr, true)
+				translatedString += helper.GetStrIfTrue(cfg.Hour+hr, true)
 			} else if (rangedH || steppedHour) && (!rangedM && !steppedMinute) { //if only the hour is ranged or stepped
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"minute")+min, true)
+				translatedString += helper.GetStrIfTrue(cfg.Minute+min, true)
 			}
 
-			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), (listedM || listedH) &&
+			translatedString += helper.GetStrIfTrue(cfg.And, (listedM || listedH) &&
 				(i < len(mm)-1) || (j < len(hh)-1))
 		}
 	}
@@ -154,22 +153,22 @@ func (t *translator) translateMinuteOrHour() {
 			if strings.Contains(hr, step) { // if the hour is stepped
 				t.cron = hr
 				t.moment = hour
-				translatedString += viper.GetString(configStr + "at_every_minute") // as the minute is * and minute will not be parsed later in this function
+				translatedString += cfg.AtEveryMinute // as the minute is * and minute will not be parsed later in this function
 				t.translateStepValues()
 				continue
 			}
 			hrr, ranged := helper.GetList(hr, rangee)
 			if ranged { // checking if the value is ranged , different output if so
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hrr[0]+
-					viper.GetString(configStr+"to")+hrr[1], i == 0)
-				translatedString += helper.GetStrIfTrue(hrr[0]+viper.GetString(configStr+"to")+hrr[1], i > 0)
+				translatedString += helper.GetStrIfTrue(cfg.AtEveryMinuteOfHour+hrr[0]+
+					cfg.To+hrr[1], i == 0)
+				translatedString += helper.GetStrIfTrue(hrr[0]+cfg.To+hrr[1], i > 0)
 
 			} else {
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at_every_minute_of_hour")+hr, i == 0)
+				translatedString += helper.GetStrIfTrue(cfg.AtEveryMinuteOfHour+hr, i == 0)
 				translatedString += helper.GetStrIfTrue(hr, i > 0)
 			}
 
-			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(hh)-1)
+			translatedString += helper.GetStrIfTrue(cfg.And, listed && i < len(hh)-1)
 		}
 	} else {
 		mm, listed := helper.GetList(mVal, list) // working with minute only
@@ -182,16 +181,16 @@ func (t *translator) translateMinuteOrHour() {
 			}
 			mr, ranged := helper.GetList(min, rangee)
 			if ranged { //checking if the value is ranged
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+viper.GetString(configStr+mStr)+
-					" "+mr[0]+viper.GetString(configStr+"to")+mr[1], i == 0)
-				translatedString += helper.GetStrIfTrue(mr[0]+viper.GetString(configStr+"to")+mr[1], i > 0)
+				translatedString += helper.GetStrIfTrue(cfg.At+cfg.ToMap()[mStr]+
+					" "+mr[0]+cfg.To+mr[1], i == 0)
+				translatedString += helper.GetStrIfTrue(mr[0]+cfg.To+mr[1], i > 0)
 			} else {
-				translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"at")+viper.GetString(configStr+mStr)+
+				translatedString += helper.GetStrIfTrue(cfg.At+cfg.ToMap()[mStr]+
 					" "+min, i == 0)
 				translatedString += helper.GetStrIfTrue(min, i > 0)
 			}
 
-			translatedString += helper.GetStrIfTrue(viper.GetString(configStr+"and"), listed && i < len(mm)-1)
+			translatedString += helper.GetStrIfTrue(cfg.And, listed && i < len(mm)-1)
 		}
 	}
 
@@ -216,8 +215,8 @@ func (t *translator) translateStepValues() error {
 			}
 			i1, _ := strconv.Atoi(rValue[0])
 			i2, _ := strconv.Atoi(rValue[1])
-			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
-				viper.GetString(configStr+"from") + weeks[i1] + viper.GetString(configStr+"to") + weeks[i2]
+			translatedString += cfg.Every + stepValue + cfg.DayOfTheWeek +
+				cfg.From + weeks[i1] + cfg.To + weeks[i2]
 		}
 		if t.moment == month {
 			if !validWordParse(&rValue[0], month) || !validWordParse(&rValue[1], month) {
@@ -225,64 +224,64 @@ func (t *translator) translateStepValues() error {
 			}
 			i1, _ := strconv.Atoi(rValue[0])
 			i2, _ := strconv.Atoi(rValue[1])
-			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
-				viper.GetString(configStr+"from") + months[i1] + viper.GetString(configStr+"to") + months[i2]
+			translatedString += cfg.Every + stepValue + cfg.MonthOfTheYear +
+				cfg.From + months[i1] + cfg.To + months[i2]
 		}
 		if t.moment == day {
-			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_month") +
-				viper.GetString(configStr+"from") + rValue[0] + viper.GetString(configStr+"to") + rValue[1]
+			translatedString += cfg.Every + stepValue + cfg.DayOfTheMonth +
+				cfg.From + rValue[0] + cfg.To + rValue[1]
 		}
 		if t.moment == hour {
-			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"hour") +
-				viper.GetString(configStr+"from") + rValue[0] + viper.GetString(configStr+"to") + rValue[1]
+			translatedString += cfg.Every + stepValue + cfg.Hour +
+				cfg.From + rValue[0] + cfg.To + rValue[1]
 		}
 		if t.moment == minute {
-			translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"minute") +
-				viper.GetString(configStr+"from") + rValue[0] + viper.GetString(configStr+"to") + rValue[1]
+			translatedString += cfg.Every + stepValue + cfg.Minute +
+				cfg.From + rValue[0] + cfg.To + rValue[1]
 		}
 	} else { //if not ranged
 		if value == every { //if */<step-value>
 			if t.moment == week {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
+				translatedString += cfg.Every + stepValue + cfg.DayOfTheWeek +
 					" "
 			}
 			if t.moment == month {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
+				translatedString += cfg.Every + stepValue + cfg.MonthOfTheYear +
 					" "
 			}
 			if t.moment == day {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_month")
+				translatedString += cfg.Every + stepValue + cfg.DayOfTheMonth
 			}
 			if t.moment == hour {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"hour")
+				translatedString += cfg.Every + stepValue + cfg.Hour
 			}
 			if t.moment == minute {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"minute")
+				translatedString += cfg.Every + stepValue + cfg.Minute
 			}
 		} else { //if example: 5/<step-value>
 			if t.moment == week {
 				i, _ := strconv.Atoi(value)
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_week") +
-					viper.GetString(configStr+"from") + weeks[i] + viper.GetString(configStr+"to") +
-					viper.GetString(configStr+"sunday")
+				translatedString += cfg.Every + stepValue + cfg.DayOfTheWeek +
+					cfg.From + weeks[i] + cfg.To +
+					cfg.Sunday
 			}
 			if t.moment == month {
 				i, _ := strconv.Atoi(value)
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"month_of_the_year") +
-					viper.GetString(configStr+"from") + months[i] + viper.GetString(configStr+"to") +
-					viper.GetString(configStr+"december")
+				translatedString += cfg.Every + stepValue + cfg.MonthOfTheYear +
+					cfg.From + months[i] + cfg.To +
+					cfg.December
 			}
 			if t.moment == day {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"day_of_the_month") +
-					viper.GetString(configStr+"from") + value + viper.GetString(configStr+"to") + "31"
+				translatedString += cfg.Every + stepValue + cfg.DayOfTheMonth +
+					cfg.From + value + cfg.To + helper.LastDay
 			}
 			if t.moment == hour {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"hour") +
-					viper.GetString(configStr+"from") + value + viper.GetString(configStr+"to") + "23"
+				translatedString += cfg.Every + stepValue + cfg.Hour +
+					cfg.From + value + cfg.To + helper.LastHour
 			}
 			if t.moment == minute {
-				translatedString += viper.GetString(configStr+"every") + stepValue + viper.GetString(configStr+"minute") +
-					viper.GetString(configStr+"from") + value + viper.GetString(configStr+"to") + "59"
+				translatedString += cfg.Every + stepValue + cfg.Minute +
+					cfg.From + value + cfg.To + helper.LastMinute
 			}
 
 		}

@@ -6,9 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/manifoldco/promptui"
-	"github.com/spf13/viper"
 )
 
 // THe app logo
@@ -97,20 +94,6 @@ func GetStrIfTrue(s string, l bool) string {
 	return ""
 }
 
-// ChangeDigitLanguage changes the language of any numeric chars in the string
-func ChangeDigitLanguage(str *string, lang string) {
-	configStr := "language." + lang + "."
-	for _, c := range *str {
-		cs := string(c)
-		if IsDigit(cs) {
-			char := viper.GetString(configStr + cs)
-			if char != "" {
-				*str = strings.Replace(*str, cs, char, -1)
-			}
-		}
-	}
-}
-
 // AddOrdinals add ordinal indicators  like 1 -> 1st 2 -> 2nd and so on
 func AddOrdinals(s string) string {
 	ss := strings.Split(s, " ")
@@ -152,21 +135,6 @@ func IndexOf(ss []string, e string) int {
 		}
 	}
 	return -1
-}
-
-// RunPrompt executes a prompt to chose an item from the cli
-func RunPrompt(label string, items []string) (string, error) {
-	prompt := promptui.Select{
-		Label: label,
-		Items: items,
-	}
-
-	_, res, err := prompt.Run()
-	if err != nil {
-		return "", err
-	}
-
-	return res, err
 }
 
 // Unique takes a string slice a removes the duplicate elements

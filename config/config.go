@@ -2,8 +2,9 @@ package config
 
 import (
 	"bytes"
-	"github.com/Anondo/crontalk/binded"
 	"log"
+
+	"github.com/Anondo/crontalk/binded"
 
 	"github.com/spf13/viper"
 )
@@ -17,6 +18,8 @@ func LoadConfig() {
 			log.Fatal("Failed to read from local config: ", err.Error())
 		}
 	}
+	LoadApp()
+	LoadLanguage()
 }
 
 func readFromBindedConfig() error {

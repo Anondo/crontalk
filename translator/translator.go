@@ -3,6 +3,7 @@ package translator
 import (
 	"strings"
 
+	"github.com/Anondo/crontalk/config"
 	"github.com/Anondo/crontalk/helper"
 
 	"github.com/spf13/viper"
@@ -12,36 +13,36 @@ var (
 	weeks     = map[int]string{}
 	months    = map[int]string{}
 	baseIndex int
-	configStr = ""
+	cfg       = config.LangConfig{}
 )
 
 // Init initializes the translator
 func Init() {
 	language := viper.GetString("lang")
-	configStr = "language." + language + "." //the config index to parse the config yaml file from viper
+	cfg = config.Language(language)
 
 	weeks = map[int]string{
-		0: viper.GetString(configStr + "sunday"),
-		1: viper.GetString(configStr + "monday"),
-		2: viper.GetString(configStr + "tuesday"),
-		3: viper.GetString(configStr + "wednesday"),
-		4: viper.GetString(configStr + "thursday"),
-		5: viper.GetString(configStr + "friday"),
-		6: viper.GetString(configStr + "saturday"),
+		0: cfg.Sunday,
+		1: cfg.Monday,
+		2: cfg.Tuesday,
+		3: cfg.Wednesday,
+		4: cfg.Thursday,
+		5: cfg.Friday,
+		6: cfg.Saturday,
 	}
 	months = map[int]string{
-		1:  viper.GetString(configStr + "january"),
-		2:  viper.GetString(configStr + "february"),
-		3:  viper.GetString(configStr + "march"),
-		4:  viper.GetString(configStr + "april"),
-		5:  viper.GetString(configStr + "may"),
-		6:  viper.GetString(configStr + "june"),
-		7:  viper.GetString(configStr + "july"),
-		8:  viper.GetString(configStr + "august"),
-		9:  viper.GetString(configStr + "september"),
-		10: viper.GetString(configStr + "october"),
-		11: viper.GetString(configStr + "november"),
-		12: viper.GetString(configStr + "december"),
+		1:  cfg.January,
+		2:  cfg.February,
+		3:  cfg.March,
+		4:  cfg.April,
+		5:  cfg.May,
+		6:  cfg.June,
+		7:  cfg.July,
+		8:  cfg.August,
+		9:  cfg.September,
+		10: cfg.October,
+		11: cfg.November,
+		12: cfg.December,
 	}
 }
 
@@ -79,7 +80,7 @@ func translateBaseOccurence() error {
 		}
 	}
 	if i == hourIndex { // checking if every sub-expression contains asteriks apart from the time part
-		translatedString += viper.GetString(configStr + "every_day")
+		translatedString += cfg.EveryDay
 	}
 	baseIndex = i //storing the base index so that when checking every other than time , the base is also omitted because its
 	//already checked
@@ -124,7 +125,7 @@ func translateAllButBaseTimeOccurence() error {
 func translateTimeOccurence() error {
 	var t translator
 	if cronSlice[minuteIndex] == every && cronSlice[hourIndex] == every { // checking if both hour and minute are defaults
-		translatedString += viper.GetString(configStr + "at_every_minute")
+		translatedString += cfg.AtEveryMinute
 	} else if cronSlice[minuteIndex] != every && cronSlice[hourIndex] != every { //checking if non of them are
 		if err := t.translateMinuteAndHour(); err != nil {
 			return err
@@ -133,4 +134,45 @@ func translateTimeOccurence() error {
 		t.translateMinuteOrHour()
 	}
 	return nil
+}
+
+func translateDigits() {
+
+	if viper.GetString("lang") == helper.LanguageEnglish {
+		return
+	}
+
+	for _, c := range translatedString {
+		cs := string(c)
+		if helper.IsDigit(cs) {
+			char := ""
+
+			switch cs {
+			case "0":
+				char = cfg.Number0
+			case "1":
+				char = cfg.Number1
+			case "2":
+				char = cfg.Number2
+			case "3":
+				char = cfg.Number3
+			case "4":
+				char = cfg.Number4
+			case "5":
+				char = cfg.Number5
+			case "6":
+				char = cfg.Number6
+			case "7":
+				char = cfg.Number7
+			case "8":
+				char = cfg.Number8
+			case "9":
+				char = cfg.Number9
+			}
+
+			if char != "" {
+				translatedString = strings.Replace(translatedString, cs, char, -1)
+			}
+		}
+	}
 }

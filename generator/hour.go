@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/Anondo/crontalk/helper"
 )
 
 const (
@@ -34,7 +32,7 @@ func runHour() error {
 	var itm string
 	var err error
 	for itm != done { // iterating until the done option is selected because of list values
-		itm, err = helper.RunPrompt("Hour", hourItems)
+		itm, err = runPrompt("Hour", hourItems)
 		if err != nil {
 			return err
 		}

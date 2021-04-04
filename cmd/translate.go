@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Anondo/crontalk/config"
 	"github.com/Anondo/crontalk/helper"
 
 	"github.com/Anondo/crontalk/translator"
@@ -34,7 +35,7 @@ func translate(cmd *cobra.Command, args []string) error {
 	lang := strings.ToLower(viper.GetString("lang"))
 
 	if lang != helper.LanguageEnglish {
-		langMap := viper.GetStringMap("language")
+		langMap := config.LanguageMap()
 		if _, exists := langMap[lang]; !exists {
 			possibleLangs := []string{}
 			for pl := range langMap {
@@ -61,13 +62,6 @@ func translate(cmd *cobra.Command, args []string) error {
 	}
 
 	output := translator.GetTranslatedStr()
-	output = helper.TrimExtraSpaces(output)
-
-	if lang != helper.LanguageEnglish {
-		helper.ChangeDigitLanguage(&output, lang) //changing the english digits to different language
-	}
-
-	output = helper.AddOrdinals(output)
 
 	fmt.Println(output)
 

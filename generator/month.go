@@ -3,7 +3,6 @@ package generator
 import (
 	"errors"
 	"fmt"
-	"github.com/Anondo/crontalk/helper"
 	"strconv"
 	"strings"
 )
@@ -33,7 +32,7 @@ func runMonth() error {
 	var itm string
 	var err error
 	for itm != done { // iterating until the done option is selected because of list values
-		itm, err = helper.RunPrompt("Month", monthItems)
+		itm, err = runPrompt("Month", monthItems)
 		if err != nil {
 			return err
 		}
